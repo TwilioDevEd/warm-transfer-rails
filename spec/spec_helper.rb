@@ -33,6 +33,7 @@ RSpec.configure do |config|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
 
+  Rails.application.routes.default_url_options[:host] = 'test.host'
   config.include Rails.application.routes.url_helpers
 
   # rspec-mocks config goes here. You can use an alternate test double
