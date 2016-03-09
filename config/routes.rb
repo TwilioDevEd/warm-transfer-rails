@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
   get 'conference/wait' => 'conference#wait'
   get 'conference/connect/client' => 'conference#connect_client'
+  post 'conference/connect/agent1' => 'conference#connect_agent1'
+  post 'conference/connect/agent2' => 'conference#connect_agent2'
 
   # Example resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
