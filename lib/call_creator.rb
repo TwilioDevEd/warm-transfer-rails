@@ -4,7 +4,7 @@ module CallCreator
     auth_token    = ENV['TWILIO_AUTH_TOKEN']
     twilio_number = ENV['TWILIO_NUMBER']
 
-    client = Twilio::REST::Client.new account_sid, auth_token
+    client = Twilio::REST::Client.new(account_sid, auth_token)
 
     call = client.account.calls.create(
       from: twilio_number,
