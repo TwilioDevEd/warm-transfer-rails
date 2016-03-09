@@ -50,6 +50,18 @@ RSpec.describe ConferenceController, type: :controller do
     end
   end
 
+  describe '#call_agent2' do
+    it "creates a call to agent 2" do
+      expect(CallCreator).to receive(:call_agent)
+        .with("agent_2", conference_connect_agent2_url)
+        .once
+
+      post :call_agent2
+
+      expect(response).to be_ok
+    end
+  end
+
   describe '#wait' do
     it "returns Dial Conference TwiML" do
 

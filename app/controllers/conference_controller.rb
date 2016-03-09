@@ -22,7 +22,8 @@ class ConferenceController < ApplicationController
   end
 
   def call_agent2
-    
+    CallCreator.call_agent('agent_2', conference_connect_agent2_url)
+    render nothing: true
   end
 
   def wait
