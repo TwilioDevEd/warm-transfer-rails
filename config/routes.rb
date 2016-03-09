@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   post 'conference/connect/agent2' => 'conference#connect_agent2'
   post 'conference/call/agent2'    => 'conference#call_agent2'
 
+  post 'token/generate/:role'  => 'token#generate'
+
   # Example resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
 

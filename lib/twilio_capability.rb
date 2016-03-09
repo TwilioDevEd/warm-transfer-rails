@@ -1,4 +1,4 @@
-class TwilioCapability
+module TwilioCapability
   def self.generate(role)
     # To find TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN visit
     # https://www.twilio.com/user/account

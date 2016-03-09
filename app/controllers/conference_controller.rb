@@ -1,4 +1,6 @@
 class ConferenceController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+
   AGENT_WAIT_URL = 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical'
 
   def connect_client
