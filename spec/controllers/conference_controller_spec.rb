@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 RSpec.describe ConferenceController, type: :controller do
   let(:callback_url) { 'http://www.example.com' }
