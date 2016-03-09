@@ -16,7 +16,7 @@ RSpec.describe ConferenceController, type: :controller do
         .with("agent_1", conference_connect_agent1_url)
         .once
 
-      get :connect_client, CallSid: "1234"
+      post :connect_client, CallSid: "1234"
 
       expect(response).to be_ok
     end
@@ -30,7 +30,7 @@ RSpec.describe ConferenceController, type: :controller do
         .once
         .and_return('<Response></Response>')
 
-      get :connect_agent1, CallSid: "1234"
+      post :connect_agent1, CallSid: "1234"
 
       expect(response).to be_ok
     end
@@ -44,7 +44,7 @@ RSpec.describe ConferenceController, type: :controller do
         .once
         .and_return('<Response></Response>')
 
-      get :connect_agent2, CallSid: "1234"
+      post :connect_agent2, CallSid: "1234"
 
       expect(response).to be_ok
     end
@@ -57,7 +57,7 @@ RSpec.describe ConferenceController, type: :controller do
         .once
         .and_return('<Response></Response>')
 
-      get :wait
+      post :wait
 
       expect(response).to be_ok
     end

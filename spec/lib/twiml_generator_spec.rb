@@ -1,3 +1,7 @@
+require 'twilio-ruby'
+require 'nokogiri'
+require_relative '../../lib/twiml_generator'
+
 describe TwimlGenerator do
   let(:call_sid) { 'CallSID' }
   let(:url)      { 'http://www.example.com' }
@@ -22,7 +26,7 @@ describe TwimlGenerator do
 
   describe '.generate_wait' do
     it 'generates twiml with say and play nodes' do
-      xml_string = described_class.generate_wait()
+      xml_string = described_class.generate_wait
       document = Nokogiri::XML(xml_string)
 
       nodes = document.root.children

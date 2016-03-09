@@ -21,6 +21,10 @@ class ConferenceController < ApplicationController
     render xml: twiml
   end
 
+  def call_agent2
+    
+  end
+
   def wait
     twiml = TwimlGenerator.generate_wait()
     render xml: twiml
