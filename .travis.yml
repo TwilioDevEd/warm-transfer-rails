@@ -3,6 +3,9 @@ rvm:
   - rvm 2.2.1
   - rvm 2.2.2
 
+before_script:
+  - psql -c 'create database warm_transfer_test;' -U postgres
+
 install:
   - bundle
 
