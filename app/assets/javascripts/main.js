@@ -1,4 +1,5 @@
 $(function() {
+  var agentId;
   var currentConnection;
   var $callStatus;
   var $connectAgent1Button = $("#connect-agent1-button");
@@ -12,6 +13,11 @@ $(function() {
   $connectAgent1Button.on('click', { role: 'agent1' }, agentClick);
   $connectAgent2Button.on('click', { role: 'agent2' }, agentClick);
   $hangupCallButton.on('click', hangUp);
+  $dialAgent2Button.on('click', dialAgent2);
+
+  function dialAgent2() {
+    $.post('/conference/' + agentId + '/call')
+  }
 
   function agentClick(e) {
     var role = e.data.role;
@@ -26,8 +32,9 @@ $(function() {
 
   function fetchToken(role) {
     $.post('/' + role + '/token', {}, function(data) {
+      agentId = data.role;
       connectClient(data.token)
-    }, 'json')
+    }, 'json');
   }
 
   function connectClient(token) {
@@ -48,7 +55,6 @@ $(function() {
     $dialAgent2Button.prop('disabled', true);
     $hangupCallButton.prop('disabled', true);
     updateCallStatus("Ready");
-    console.log("blaaaaaa");
   }
 
   Twilio.Device.ready(function (device) {
