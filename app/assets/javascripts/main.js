@@ -1,14 +1,17 @@
-$(function(){
-  var callStatus;
-  var $agent1Btn = $("#agent1-btn");
-  var $agent2Btn = $("#agent2-btn");
+$(function() {
+  var currentConnection;
+  var $callStatus;
+  var $connectAgent1Button = $("#connect-agent1-button");
+  var $connectAgent2Button = $("#connect-agent2-button");
 
-  var $answerBtn = $("#answer-btn");
-  var $dialAgent2Btn = $("#dial-agent2-btn");
+  var $answerCallButton = $("#answer-call-button");
+  var $hangupCallButton = $("#hangup-call-button");
+  var $dialAgent2Button = $("#dial-agent2-button");
 
-  callStatus = $('#call-status');
-  $agent1Btn.on('click', { role: 'agent1' }, agentClick);
-  $agent2Btn.on('click', { role: 'agent2' }, agentClick);
+  $callStatus = $('#call-status');
+  $connectAgent1Button.on('click', { role: 'agent1' }, agentClick);
+  $connectAgent2Button.on('click', { role: 'agent2' }, agentClick);
+  $hangupCallButton.on('click', hangUp);
 
   function agentClick(e) {
     var role = e.data.role;
@@ -17,12 +20,12 @@ $(function(){
   }
 
   function disableConnectButtons(disable) {
-    agent1Btn.prop('disabled', disable);
-    agent2Btn.prop('disabled', disable);
+    $connectAgent1Button.prop('disabled', disable);
+    $connectAgent2Button.prop('disabled', disable);
   }
 
   function fetchToken(role) {
-    $.post('/token/generate/' + role, {}, function(data) {
+    $.post('/' + role + '/token', {}, function(data) {
       connectClient(data.token)
     }, 'json')
   }
@@ -31,17 +34,15 @@ $(function(){
     Twilio.Device.setup(token);
   }
 
-  function renderConnectedUi() {
-    $agent1Btn.addClass('hidden');
-    $agent2Btn.addClass('hidden');
-    $agent1Btn.addClass('hidden');
-    $("#agent2-btn").prop('disabled', disable);
+  function renderConnectedUi(role) {
+    $('#connect-agent-row').addClass('hidden');
+    $('#connected-agent-row').removeClass('hidden');
+    $connectAgent1Button.addClass('hidden');
   }
 
   Twilio.Device.ready(function (device) {
     updateCallStatus("Ready");
-
-    renderConnectedUi();
+    renderConnectedUi(device._clientName);
   });
 
   /* Report any errors to the call status display */
@@ -52,21 +53,29 @@ $(function(){
 
   /* Callback for when Twilio Client receives a new incoming call */
   Twilio.Device.incoming(function(connection) {
+    currentConnection = connection;
     updateCallStatus("Incoming support call");
 
     // Set a callback to be executed when the connection is accepted
     connection.accept(function() {
       updateCallStatus("In call with customer");
+      $answerCallButton.prop('disabled', true);
+      $hangupCallButton.prop('disabled', false);
     });
 
     // Set a callback on the answer button and enable it
-    answerButton.click(function() {
+    $answerCallButton.click(function() {
       connection.accept();
     });
-    answerButton.prop("disabled", false);
+    $answerCallButton.prop('disabled', false);
   });
 
+  /* End a call */
+  function hangUp() {
+    Twilio.Device.disconnectAll();
+  }
+
   function updateCallStatus(status) {
-    callStatus.text(status);
+    $callStatus.text(status);
   }
 });
