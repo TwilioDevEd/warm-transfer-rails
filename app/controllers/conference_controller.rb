@@ -4,7 +4,7 @@ class ConferenceController < ApplicationController
   AGENT_WAIT_URL = 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical'
 
   def connect_client
-    CallCreator.call_agent('agent_1', conference_connect_agent1_url)
+    CallCreator.call_agent('agent1', conference_connect_agent1_url)
 
     twiml = TwimlGenerator
       .generate_connect_conference(params[:CallSid], conference_wait_url, false, true)
@@ -24,7 +24,7 @@ class ConferenceController < ApplicationController
   end
 
   def call_agent2
-    CallCreator.call_agent('agent_2', conference_connect_agent2_url)
+    CallCreator.call_agent('agent2', conference_connect_agent2_url)
     render nothing: true
   end
 

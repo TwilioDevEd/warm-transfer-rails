@@ -10,7 +10,10 @@ Rails.application.routes.draw do
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
-  get  'conference/wait'           => 'conference#wait'
+
+  root 'home#index'
+
+  post  'conference/wait'           => 'conference#wait'
   post 'conference/connect/client' => 'conference#connect_client'
   post 'conference/connect/agent1' => 'conference#connect_agent1'
   post 'conference/connect/agent2' => 'conference#connect_agent2'
