@@ -34,15 +34,26 @@ $(function() {
     Twilio.Device.setup(token);
   }
 
-  function renderConnectedUi(role) {
+  function agentConnectedHandler(role) {
     $('#connect-agent-row').addClass('hidden');
     $('#connected-agent-row').removeClass('hidden');
     $connectAgent1Button.addClass('hidden');
+    $dialAgent2Button.prop('disabled', false);
+    if (role === 'agent1') {
+      $dialAgent2Button.removeClass('hidden');
+    }
+  }
+
+  function callEndedHandler(role) {
+    $dialAgent2Button.prop('disabled', true);
+    $hangupCallButton.prop('disabled', true);
+    updateCallStatus("Ready");
+    console.log("blaaaaaa");
   }
 
   Twilio.Device.ready(function (device) {
     updateCallStatus("Ready");
-    renderConnectedUi(device._clientName);
+    agentConnectedHandler(device._clientName);
   });
 
   /* Report any errors to the call status display */
@@ -51,7 +62,8 @@ $(function() {
     disableConnectButtons(false);
   });
 
-  /* Callback for when Twilio Client receives a new incoming call */
+
+  // Callback for when Twilio Client receives a new incoming call
   Twilio.Device.incoming(function(connection) {
     currentConnection = connection;
     updateCallStatus("Incoming support call");
@@ -68,6 +80,11 @@ $(function() {
       connection.accept();
     });
     $answerCallButton.prop('disabled', false);
+  });
+
+  // Callback for when the call finalizes
+  Twilio.Device.disconnect(function(connection) {
+    callEndedHandler();
   });
 
   /* End a call */
