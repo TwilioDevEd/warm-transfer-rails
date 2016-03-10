@@ -5,10 +5,6 @@ RSpec.describe ConferenceController, type: :controller do
   let(:agent_wait_url) { 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical' }
   let(:conference_id)  { 'conference1234' }
 
-  before do
-    ActiveCall.destroy_all
-  end
-
   describe '#connect_client' do
     it "returns Dial Conference TwiML" do
       call_sid = '1234'

@@ -25,6 +25,9 @@ require 'rspec/rails'
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.use_transactional_fixtures = true
+
+  ActiveRecord::Migration.maintain_test_schema!
 
   Rails.application.routes.default_url_options[:host] = 'test.host'
   config.include Rails.application.routes.url_helpers
