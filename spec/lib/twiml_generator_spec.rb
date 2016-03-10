@@ -35,7 +35,7 @@ describe TwimlGenerator do
         .to eq('Thank you for calling. Please wait in line for a few seconds. An agent will be with you shortly.')
       expect(nodes[1].name).to eq('Play')
       expect(nodes[1].content)
-        .to eq('http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical')
+        .to eq('http://com.twilio.music.classical.s3.amazonaws.com/BusyStrings.mp3')
     end
   end
 end

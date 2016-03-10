@@ -13,7 +13,7 @@ Rails.application.routes.draw do
 
   root 'home#index'
 
-  post  'conference/wait'           => 'conference#wait'
+  post 'conference/wait'           => 'conference#wait'
   post 'conference/connect/client' => 'conference#connect_client'
   post 'conference/connect/agent1' => 'conference#connect_agent1'
   post 'conference/connect/agent2' => 'conference#connect_agent2'

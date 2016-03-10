@@ -13,7 +13,7 @@ RSpec.describe ConferenceController, type: :controller do
         .and_return('<Response></Response>')
 
       expect(CallCreator).to receive(:call_agent)
-        .with("agent_1", conference_connect_agent1_url)
+        .with("agent1", conference_connect_agent1_url)
         .once
 
       post :connect_client, CallSid: "1234"
@@ -53,7 +53,7 @@ RSpec.describe ConferenceController, type: :controller do
   describe '#call_agent2' do
     it "creates a call to agent 2" do
       expect(CallCreator).to receive(:call_agent)
-        .with("agent_2", conference_connect_agent2_url)
+        .with("agent2", conference_connect_agent2_url)
         .once
 
       post :call_agent2
