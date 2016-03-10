@@ -3,11 +3,15 @@ require 'rails_helper'
 RSpec.describe ConferenceController, type: :controller do
   let(:callback_url)   { 'http://www.example.com' }
   let(:agent_wait_url) { 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical' }
-  let(:call_sid)       { "1234" }
+  let(:conference_id)  { 'conference1234' }
+
+  before do
+    ActiveCall.destroy_all
+  end
 
   describe '#connect_client' do
     it "returns Dial Conference TwiML" do
-
+      call_sid = '1234'
       expect(TwimlGenerator).to receive(:generate_connect_conference)
         .with(call_sid, conference_wait_url, false, true)
         .once
@@ -27,11 +31,11 @@ RSpec.describe ConferenceController, type: :controller do
     it "returns Dial Conference TwiML" do
 
       expect(TwimlGenerator).to receive(:generate_connect_conference)
-        .with(call_sid, agent_wait_url, true, false)
+        .with(conference_id, agent_wait_url, true, false)
         .once
         .and_return('<Response></Response>')
 
-      post :connect_agent1, conference_id: call_sid
+      post :connect_agent1, conference_id: conference_id
 
       expect(response).to be_ok
     end
@@ -41,11 +45,11 @@ RSpec.describe ConferenceController, type: :controller do
     it "returns Dial Conference TwiML" do
 
       expect(TwimlGenerator).to receive(:generate_connect_conference)
-        .with(call_sid, agent_wait_url, true, true)
+        .with(conference_id, agent_wait_url, true, true)
         .once
         .and_return('<Response></Response>')
 
-      post :connect_agent2, conference_id: call_sid
+      post :connect_agent2, conference_id: conference_id
 
       expect(response).to be_ok
     end
@@ -53,11 +57,12 @@ RSpec.describe ConferenceController, type: :controller do
 
   describe '#call_agent2' do
     it "creates a call to agent 2" do
+      active_call = ActiveCall.create(agent_id: 'agent1', conference_id: conference_id)
       expect(CallCreator).to receive(:call_agent)
-        .with("agent2", conference_connect_agent2_url(conference_id: call_sid))
+        .with("agent2", conference_connect_agent2_url(conference_id: conference_id))
         .once
 
-      post :call_agent2, conference_id: call_sid
+      post :call_agent2, agent: 'agent1'
 
       expect(response).to be_ok
     end
