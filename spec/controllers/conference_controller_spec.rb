@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe ConferenceController, type: :controller do
-  let(:callback_url)   { 'http://www.example.com' }
   let(:agent_wait_url) { 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical' }
   let(:conference_id)  { 'conference1234' }
 
