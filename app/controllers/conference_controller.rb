@@ -11,7 +11,9 @@ class ConferenceController < ApplicationController
     twiml = TwimlGenerator
       .generate_connect_conference(conference_id, conference_wait_url, false, true)
 
-    ActiveCall.where(agent_id: agent_id).first_or_create(conference_id: conference_id)
+    call = ActiveCall.where(agent_id: agent_id).first_or_create(conference_id: conference_id)
+    call.conference_id = conference_id
+    call.save!
 
     render xml: twiml
   end
