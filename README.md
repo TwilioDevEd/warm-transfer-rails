@@ -1,5 +1,6 @@
 # Warm Transfer: Transfer support calls from one agent to another using ruby on rails
 [![Build Status](https://travis-ci.org/TwilioDevEd/warm-transfer-rails.svg)](https://travis-ci.org/TwilioDevEd/warm-transfer-rails)
+[![Coverage Status](https://coveralls.io/repos/github/TwilioDevEd/warm-transfer-rails/badge.svg?branch=master)](https://coveralls.io/github/TwilioDevEd/warm-transfer-rails?branch=master)
 
 ## Local development
 
@@ -66,7 +67,7 @@ This project is built using the [Ruby on Rails](http://rubyonrails.org/) web fra
   ```
   http://9a159ccf.ngrok.io/conference/connect/client
   ```
-  
+
   ![Configure Voice](http://howtodocs.s3.amazonaws.com/twilio-number-config-all-med.gif)
 
 
