@@ -1,9 +1,9 @@
 require 'twilio-ruby'
-require_relative '../../lib/call_creator'
+require_relative '../../lib/caller'
 
-describe CallCreator do
+describe Caller do
   describe '.call_agent' do
-    it 'creates a call to a twilio web client' do
+    it 'creates a call to a Twilio web client' do
       agent_id = 'jhondoe'
       callback_url = 'http://www.example.com'
       client_double = double(:client)

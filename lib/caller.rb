@@ -1,4 +1,4 @@
-module CallCreator
+module Caller
   def self.call_agent(agent_id, callback_url)
     account_sid   = ENV['TWILIO_ACCOUNT_SID']
     auth_token    = ENV['TWILIO_AUTH_TOKEN']
