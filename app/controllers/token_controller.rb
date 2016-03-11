@@ -1,8 +1,8 @@
 class TokenController < ApplicationController
   skip_before_filter :verify_authenticity_token
+
   def generate
-    role = params[:role]
-    result = { token: TwilioCapability.generate(role), role: role }
-    render json: result
+    agent_id = params[:agent_id]
+    render json: { token: TwilioCapability.generate(agent_id), agentId: agent_id }
   end
 end

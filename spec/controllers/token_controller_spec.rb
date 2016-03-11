@@ -2,14 +2,14 @@ require 'rails_helper'
 
 RSpec.describe TokenController, type: :controller do
   describe '#generate' do
-    role = 'agent'
+    agent_id = 'agent'
     it "generates a capibility token" do
       expect(TwilioCapability).to receive(:generate)
-        .with(role)
+        .with(agent_id)
         .once
         .and_return('token')
 
-      post :generate, role: role
+      post :generate, agent_id: agent_id
 
       expect(response).to be_ok
     end

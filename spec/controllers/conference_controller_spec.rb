@@ -53,12 +53,12 @@ RSpec.describe ConferenceController, type: :controller do
 
   describe '#call_agent2' do
     it "creates a call to agent 2" do
-      active_call = ActiveCall.create(agent_id: 'agent1', conference_id: conference_id)
+      ActiveCall.create(agent_id: 'agent1', conference_id: conference_id)
       expect(CallCreator).to receive(:call_agent)
         .with("agent2", conference_connect_agent2_url(conference_id: conference_id))
         .once
 
-      post :call_agent2, agent: 'agent1'
+      post :call_agent2, agent_id: 'agent1'
 
       expect(response).to be_ok
     end
