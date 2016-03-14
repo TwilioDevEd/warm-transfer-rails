@@ -1,0 +1,102 @@
+.chapter(data-title='Setting Up The Application')
+  .step(
+    data-title='What Are We Building?',
+    data-file='config/routes.rb')
+    :markdown
+      ## Warm Trasnfer
+      ![Warm Transfer](//howtodocs.s3.amazonaws.com/warm-transfers.png)
+
+      Have you ever been disconnected from a support call while been transfered to 
+      somone else?
+      
+      Warm transfer eliminates this problem. Using this Twilio powered 
+      application you can connect with a support agent which will have the ability 
+      to dial someone else in before dropping the call.
+      
+      Here is how it works at a high level:
+      
+      1. The first agent becomes available when he/she connects through the web client.
+      
+      1. The second agent also becomes available when he/she connects through the web client.
+
+      1. A client calls our support line.
+      
+      1. The client stays on hold while the first joins the call.
+      
+      1. While the first agent is on the phone with the client, he/she can dial a second agent into the call.
+      
+      1. Once the second agent is on the call, the first one can disconect from it.
+      The client and the second agent stay on the call.
+
+      Let's get started!
+
+      
+  .step(
+    data-title="Setting Up Voice Web Hook",
+    data-file='config/routes.rb',
+    data-highlight='5-5')
+    :markdown
+      ## Setting Up Voice Web Hook
+      
+      You will need to configure the voice webhook of the Twilio number that clients
+      will call when they want to talk to a support agent.
+      ![Configure Voice](//howtodocs.s3.amazonaws.com/twilio-number-config-all-med.gif)
+      
+      You need to expose your localhost using a tool like [ngrok](//ngrok.com/).
+      Now your voice URL should look something like this:
+      
+      ```
+      https://<subdomain>.ngrok.io/conference/connect/client
+      ```
+      
+      **Note:** It is importantthat you use the `https` protocol because otherwise,
+      your browser won't allow you to use your mic.
+
+
+  .step(
+    data-title="Handling Incoming Calls From Clients",
+    data-file='app/controllers/conference_controller.rb',
+    data-highlight='6-21')
+    :markdown
+      ## Handling Incoming Calls From Clients
+      
+      When a client makes a call to our Twilio number we receive a POST request 
+      asking for instructions. We'll use TwiML to instruct the client to join a
+      conference room and the Twilio REST API client to start a call to
+      the first agent, so he can join the same conference.
+      
+      We use the client's `CallSid` as the conference identifier all the participants
+      require to join the conference room. That's why this identifier is stored in a
+      database. This way the conference identifier can be used later to dial the second
+      agent in.
+      
+  .step(
+    data-title="Providing TwiML Instruction For The Client",
+    data-file='lib/twiml_generator.rb',
+    data-highlight='2-10')
+    :markdown
+      ## Providing TwiML Instruction For The Client
+      
+      We create a `TwiMLResponse` that will contain a
+      [`Dial`](//www.twilio.com/docs/api/twiml/dial) verb with a
+      [`Conference`](https://www.twilio.com/docs/api/twiml/conference) noun that
+      will instruct the client to connect to a specific conference room.
+      
+  
+  .step(
+    data-title='Dial First Agent Into the Call',
+    data-file='lib/caller.rb',
+    data-highlight='3-13')
+    :markdown
+      ## Dial First Agent Into the Call
+      
+      We'll use Twilio REST API client to create a new call. The `create` method
+      receives a hash with the following keys:
+      
+      1. `from`: 
+      
+      1. `to`  : 
+      
+      1. `url` :  
+      
+      
