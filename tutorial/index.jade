@@ -67,9 +67,11 @@
       to receive phone calls. `Twilio.Device.ready` callback is used to update 
       the UI once the client has been set up.
       
-      `Twilio.Device.incoming` callback is invoked when the client receives an incoming call.
+      `Twilio.Device.incoming` callback gets invoked when the client receives an incoming call.
       This is where the call is actually connected to the client and it is as simple as
       calling the `accept` method on the incoming connection.
+      
+      In the next step we'll take a closer look into capability token generation.
       
       ---
 
@@ -77,7 +79,6 @@
 
       * [Twilio.js Library](//www.twilio.com/docs/api/client/twilio-js)
       * [Twilio Client Quickstart](//www.twilio.com/docs/quickstart/client)
-
   
   .step(
     data-title="Generate a Capability Token",
@@ -86,14 +87,13 @@
     :markdown
       ## Generate a Capability Token
 
-      Our support agents will be available for incoming calls through a Twilio
-      web client. In order for agents to connect we need to provide them with a
-      [capability token](//www.twilio.com/docs/client/capability-tokens).
+      In order to connect the [Twilio Voice Web Client](//www.twilio.com/webrtc)
+      we need a [capability token](//www.twilio.com/docs/client/capability-tokens).
       
-      When an agent goes to the home page, he/she must choose to connect as `agent1`
-      or `agent2`. In order to requests a capability token, the agent must provide
-      a string that will be used as the agent's identifier. For this tutorial we use
-      fixed identifier strings like `agent1` and `agent2`.
+      To allow incoming connections through the web client an identifier must be
+      provided when generating the token. For this tutorial we used fixed identifier
+      strings like `agent1` and `agent2`. These identifiers will be used to create
+      outbound calls to the specified agent using the [Twilio REST API](//www.twilio.com/docs/api/rest).
 
       ---
 
@@ -101,6 +101,7 @@
 
       * [Twilio Client: Capability Tokens](//www.twilio.com/docs/client/capability-tokens)
       * [Generate Capability Tokens with twilio-ruby](//twilio-ruby.readthedocs.org/en/latest/usage/token-generation.html)
+      * [Making Calls With Twilio REST API](//www.twilio.com/docs/api/rest/making-calls)
 
   .step(
     data-title="Handling Incoming Calls From Clients",
@@ -109,10 +110,16 @@
     :markdown
       ## Handling Incoming Calls From Clients
       
-      When a client makes a call to our Twilio number we receive a POST request 
-      asking for instructions. We'll use TwiML to instruct the client to join a
-      conference room and the Twilio REST API client to start a call to
+      When a client makes a call to our Twilio number the application receives 
+      a POST request asking for instructions. We'll use TwiML to instruct the client
+      to join a conference room and the Twilio REST API client to start a call to
       the first agent, so he can join the same conference.
+      
+      When providing instructions to the client, we also provide a
+      [`waitUrl`](//www.twilio.com/docs/api/twiml/conference#attributes-waitUrl)
+      which in our case is another end point of our application. This returns more TwiML
+      to [say](//www.twilio.com/docs/api/twiml/say) welcome to the user, and also
+      to [play](//www.twilio.com/docs/api/twiml/play) some music while on hold.
       
       We use the client's `CallSid` as the conference identifier all the participants
       require to join the conference room. That's why this identifier is stored in a
@@ -138,12 +145,13 @@
     :markdown
       ## Dial First Agent Into the Call
         
-      We'll use Twilio REST API client to create a new call. The `create` method
+      This application uses an abstraction for the purpose of dialing agents in.
+      A Twilio REST API client is used to create a new call. The `create` method
       receives a hash with the following keys:
       
       1. `from`: Your Twilio number
       
-      1. `to`  : The agent web client's identifier (we'll get to this shortly)
+      1. `to`  : The agent web client's identifier (`agent1` or `agent2`)
       
       1. `url` : A url to ask for TwiML instructions when the call connects
       
@@ -152,25 +160,36 @@
       the client is already waiting.
       
   .step(
-    data-title='Dial First Agent Into the Call',
-    data-file='lib/caller.rb',
-    data-highlight='3-13')
+    data-title='Dial Second Agent Into the Call',
+    data-file='app/controllers/conference_controller.rb',
+    data-highlight='35-42')
     :markdown
-      ## TODO
+      ## Dial Second Agent Into the Call
         
-      We'll use Twilio REST API client to create a new call. The `create` method
-      receives a hash with the following keys:
+      When the client and the first agents are both in the call we are ready to 
+      perform a *warm  transfer* to a second agent. The first agent makes a 
+      request passing its `identifier` to allow us to look for the `conference_id`
+      we should use to dial the second agent in. For this purpose we'll use the 
+      `Caller` abstraction as done before. 
       
-      1. `from`: Your Twilio number
+  .step(
+    data-title='The First Agent Leaves the Call',
+    data-file='lib/twiml_generator.rb',
+    data-highlight='3-9')
+    :markdown
+      ## The First Agent Leaves the Call
       
-      1. `to`  : The agent web client's identifier
+      When the three participants have joined the same call, the first agent has
+      served his purpose. Now he can drop the call, leaving agent two and the client
+      to have a pleasant conversation.
       
-      1. `url` : A url to ask for TwiML instructions when the call connects
+      It is important to notice the differences between the TwiML each one of the
+      participants received when joining the call. Both, agent one and two, have
+      `startConferenceOnEnter` set to `true`. This means the conference will start when
+      any of them join the call. For the client calling and agent two, `endConferenceOnExit`
+      is set to true. This causes the call to end when any of this two participants
+      drop the call.
       
-      Once the agent answers the call in the web client, a request is made to the
-      callback url instructing the agent's call to join the conference room where
-      the client is already waiting.
       
-    
       
       

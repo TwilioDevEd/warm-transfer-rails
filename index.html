@@ -50,11 +50,10 @@ or <code>agent2</code>. Then a capability token is requested
 in order to set up our Twilio web client and make it available 
 to receive phone calls. <code>Twilio.Device.ready</code> callback is used to update 
 the UI once the client has been set up.</p>
-<p>Twilio.Device.incoming` callback is called when the client receives an incoming call.
-This is where the answer call button is configured to answer an incoming call.</p>
-<p>In order to requests a capability token, the agent must provide
-a string that will be used as the agent&#39;s identifier. For this tutorial we use
-fixed identifier strings like <code>agent1</code> and <code>agent2</code>.</p>
+<p><code>Twilio.Device.incoming</code> callback gets invoked when the client receives an incoming call.
+This is where the call is actually connected to the client and it is as simple as
+calling the <code>accept</code> method on the incoming connection.</p>
+<p>In the next step we&#39;ll take a closer look into capability token generation.</p>
 <hr>
 <p><strong>See also:</strong></p>
 <ul>
@@ -62,24 +61,29 @@ fixed identifier strings like <code>agent1</code> and <code>agent2</code>.</p>
 <li><a href="//www.twilio.com/docs/quickstart/client">Twilio Client Quickstart</a></li>
 </ul>
 </div><div data-title="Generate a Capability Token" data-file="lib/twilio_capability.rb" data-highlight="5-10" class="step"><h2 id="generate-a-capability-token">Generate a Capability Token</h2>
-<p>Our support agents will be available for incoming calls through a Twilio
-web client. In order for agents to connect we need to provide them with a
-<a href="//www.twilio.com/docs/client/capability-tokens">capability token</a>.</p>
-<p>When an agent goes to the home page, he/she must choose to connect as <code>agent1</code>
-or <code>agent2</code>. In order to requests a capability token, the agent must provide
-a string that will be used as the agent&#39;s identifier. For this tutorial we use
-fixed identifier strings like <code>agent1</code> and <code>agent2</code>.</p>
+<p>In order to connect the <a href="//www.twilio.com/webrtc">Twilio Voice Web Client</a>
+we need a <a href="//www.twilio.com/docs/client/capability-tokens">capability token</a>.</p>
+<p>To allow incoming connections through the web client an identifier must be
+provided when generating the token. For this tutorial we used fixed identifier
+strings like <code>agent1</code> and <code>agent2</code>. These identifiers will be used to create
+outbound calls to the specified agent using the <a href="//www.twilio.com/docs/api/rest">Twilio REST API</a>.</p>
 <hr>
 <p><strong>See also:</strong></p>
 <ul>
 <li><a href="//www.twilio.com/docs/client/capability-tokens">Twilio Client: Capability Tokens</a></li>
 <li><a href="//twilio-ruby.readthedocs.org/en/latest/usage/token-generation.html">Generate Capability Tokens with twilio-ruby</a></li>
+<li><a href="//www.twilio.com/docs/api/rest/making-calls">Making Calls With Twilio REST API</a></li>
 </ul>
 </div><div data-title="Handling Incoming Calls From Clients" data-file="app/controllers/conference_controller.rb" data-highlight="6-21" class="step"><h2 id="handling-incoming-calls-from-clients">Handling Incoming Calls From Clients</h2>
-<p>When a client makes a call to our Twilio number we receive a POST request 
-asking for instructions. We&#39;ll use TwiML to instruct the client to join a
-conference room and the Twilio REST API client to start a call to
+<p>When a client makes a call to our Twilio number the application receives 
+a POST request asking for instructions. We&#39;ll use TwiML to instruct the client
+to join a conference room and the Twilio REST API client to start a call to
 the first agent, so he can join the same conference.</p>
+<p>When providing instructions to the client, we also provide a
+<a href="//www.twilio.com/docs/api/twiml/conference#attributes-waitUrl"><code>waitUrl</code></a>
+which in our case is another end point of our application. This returns more TwiML
+to <a href="//www.twilio.com/docs/api/twiml/say">say</a> welcome to the user, and also
+to <a href="//www.twilio.com/docs/api/twiml/play">play</a> some music while on hold.</p>
 <p>We use the client&#39;s <code>CallSid</code> as the conference identifier all the participants
 require to join the conference room. That&#39;s why this identifier is stored in a
 database. This way the conference identifier can be used later to dial the second
@@ -90,12 +94,13 @@ agent in.</p>
 <a href="https://www.twilio.com/docs/api/twiml/conference"><code>Conference</code></a> noun that
 will instruct the client to join a specific conference room.      </p>
 </div><div data-title="Dial First Agent Into the Call" data-file="lib/caller.rb" data-highlight="3-13" class="step"><h2 id="dial-first-agent-into-the-call">Dial First Agent Into the Call</h2>
-<p>We&#39;ll use Twilio REST API client to create a new call. The <code>create</code> method
+<p>This application uses an abstraction for the purpose of dialing agents in.
+A Twilio REST API client is used to create a new call. The <code>create</code> method
 receives a hash with the following keys:</p>
 <ol>
 <li><p><code>from</code>: Your Twilio number</p>
 </li>
-<li><p><code>to</code>  : The agent web client&#39;s identifier (we&#39;ll get to this shortly)</p>
+<li><p><code>to</code>  : The agent web client&#39;s identifier (<code>agent1</code> or <code>agent2</code>)</p>
 </li>
 <li><p><code>url</code> : A url to ask for TwiML instructions when the call connects</p>
 </li>
@@ -103,20 +108,22 @@ receives a hash with the following keys:</p>
 <p>Once the agent answers the call in the web client, a request is made to the
 callback url instructing the agent&#39;s call to join the conference room where
 the client is already waiting.</p>
-</div><div data-title="Dial First Agent Into the Call" data-file="lib/caller.rb" data-highlight="3-13" class="step"><h2 id="todo">TODO</h2>
-<p>We&#39;ll use Twilio REST API client to create a new call. The <code>create</code> method
-receives a hash with the following keys:</p>
-<ol>
-<li><p><code>from</code>: Your Twilio number</p>
-</li>
-<li><p><code>to</code>  : The agent web client&#39;s identifier</p>
-</li>
-<li><p><code>url</code> : A url to ask for TwiML instructions when the call connects</p>
-</li>
-</ol>
-<p>Once the agent answers the call in the web client, a request is made to the
-callback url instructing the agent&#39;s call to join the conference room where
-the client is already waiting.</p>
+</div><div data-title="Dial Second Agent Into the Call" data-file="app/controllers/conference_controller.rb" data-highlight="35-42" class="step"><h2 id="dial-second-agent-into-the-call">Dial Second Agent Into the Call</h2>
+<p>When the client and the first agents are both in the call we are ready to 
+perform a <em>warm  transfer</em> to a second agent. The first agent makes a 
+request passing its <code>identifier</code> to allow us to look for the <code>conference_id</code>
+we should use to dial the second agent in. For this purpose we&#39;ll use the 
+<code>Caller</code> abstraction as done before. </p>
+</div><div data-title="The First Agent Leaves the Call" data-file="lib/twiml_generator.rb" data-highlight="3-9" class="step"><h2 id="the-first-agent-leaves-the-call">The First Agent Leaves the Call</h2>
+<p>When the three participants have joined the same call, the first agent has
+served his purpose. Now he can drop the call, leaving agent two and the client
+to have a pleasant conversation.</p>
+<p>It is important to notice the differences between the TwiML each one of the
+participants received when joining the call. Both, agent one and two, have
+<code>startConferenceOnEnter</code> set to <code>true</code>. This means the conference will start when
+any of them join the call. For the client calling and agent two, <code>endConferenceOnExit</code>
+is set to true. This causes the call to end when any of this two participants
+drop the call.</p>
 </div></div>
 <div class="saurus-files" style="display:none;"><textarea class="saurus-file" data-file="config/routes.rb" data-mode="ruby">UmFpbHMuYXBwbGljYXRpb24ucm91dGVzLmRyYXcgZG8KICByb290ICdob21lI2luZGV4JwoKICBwb3N0ICdjb25mZXJlbmNlL3dhaXQnICAgICAgICAgICAgICAgICAgICAgICAgICAgPT4gJ2NvbmZlcmVuY2Ujd2FpdCcKICBwb3N0ICdjb25mZXJlbmNlL2Nvbm5lY3QvY2xpZW50JyAgICAgICAgICAgICAgICAgPT4gJ2NvbmZlcmVuY2UjY29ubmVjdF9jbGllbnQnCiAgcG9zdCAnY29uZmVyZW5jZS86Y29uZmVyZW5jZV9pZC9jb25uZWN0L2FnZW50MS8nID0+ICdjb25mZXJlbmNlI2Nvbm5lY3RfYWdlbnQxJywgYXM6IDpjb25mZXJlbmNlX2Nvbm5lY3RfYWdlbnQxCiAgcG9zdCAnY29uZmVyZW5jZS86Y29uZmVyZW5jZV9pZC9jb25uZWN0L2FnZW50MicgID0+ICdjb25mZXJlbmNlI2Nvbm5lY3RfYWdlbnQyJywgYXM6IDpjb25mZXJlbmNlX2Nvbm5lY3RfYWdlbnQyCiAgcG9zdCAnY29uZmVyZW5jZS86YWdlbnRfaWQvY2FsbCcgICAgICAgICAgICAgICAgID0+ICdjb25mZXJlbmNlI2NhbGxfYWdlbnQyJywgICAgYXM6IDpjb25mZXJlbmNlX2NhbGxfYWdlbnQyCgogIHBvc3QgJzphZ2VudF9pZC90b2tlbicgICAgICAgICAgICAgICAgICAgICAgICAgICA9PiAndG9rZW4jZ2VuZXJhdGUnCgplbmQK</textarea>
 <textarea class="saurus-file" data-file="app/assets/javascripts/main.js" data-mode="javascript">JChmdW5jdGlvbigpIHsKICB2YXIgY3VycmVudEFnZW50SWQ7CiAgdmFyIGN1cnJlbnRDb25uZWN0aW9uOwogIHZhciAkY2FsbFN0YXR1cyA9ICQoJyNjYWxsLXN0YXR1cycpOwogIHZhciAkY29ubmVjdEFnZW50MUJ1dHRvbiA9ICQoIiNjb25uZWN0LWFnZW50MS1idXR0b24iKTsKICB2YXIgJGNvbm5lY3RBZ2VudDJCdXR0b24gPSAkKCIjY29ubmVjdC1hZ2VudDItYnV0dG9uIik7CgogIHZhciAkYW5zd2VyQ2FsbEJ1dHRvbiA9ICQoIiNhbnN3ZXItY2FsbC1idXR0b24iKTsKICB2YXIgJGhhbmd1cENhbGxCdXR0b24gPSAkKCIjaGFuZ3VwLWNhbGwtYnV0dG9uIik7CiAgdmFyICRkaWFsQWdlbnQyQnV0dG9uID0gJCgiI2RpYWwtYWdlbnQyLWJ1dHRvbiIpOwoKICAkY29ubmVjdEFnZW50MUJ1dHRvbi5vbignY2xpY2snLCB7IGFnZW50SWQ6ICdhZ2VudDEnIH0sIGFnZW50Q2xpY2tIYW5kbGVyKTsKICAkY29ubmVjdEFnZW50MkJ1dHRvbi5vbignY2xpY2snLCB7IGFnZW50SWQ6ICdhZ2VudDInIH0sIGFnZW50Q2xpY2tIYW5kbGVyKTsKICAkaGFuZ3VwQ2FsbEJ1dHRvbi5vbignY2xpY2snLCBoYW5nVXApOwogICRkaWFsQWdlbnQyQnV0dG9uLm9uKCdjbGljaycsIGRpYWxBZ2VudDIpOwoKICBmdW5jdGlvbiBmZXRjaFRva2VuKGFnZW50SWQpIHsKICAgICQucG9zdCgnLycgKyBhZ2VudElkICsgJy90b2tlbicsIHt9LCBmdW5jdGlvbihkYXRhKSB7CiAgICAgIGN1cnJlbnRBZ2VudElkID0gZGF0YS5hZ2VudElkOwogICAgICBjb25uZWN0Q2xpZW50KGRhdGEudG9rZW4pCiAgICB9LCAnanNvbicpOwogIH0KCiAgZnVuY3Rpb24gY29ubmVjdENsaWVudCh0b2tlbikgewogICAgVHdpbGlvLkRldmljZS5zZXR1cCh0b2tlbik7CiAgfQoKICBUd2lsaW8uRGV2aWNlLnJlYWR5KGZ1bmN0aW9uIChkZXZpY2UpIHsKICAgIHVwZGF0ZUNhbGxTdGF0dXMoIlJlYWR5Iik7CiAgICBhZ2VudENvbm5lY3RlZEhhbmRsZXIoZGV2aWNlLl9jbGllbnROYW1lKTsKICB9KTsKCiAgLy8gQ2FsbGJhY2sgZm9yIHdoZW4gVHdpbGlvIENsaWVudCByZWNlaXZlcyBhIG5ldyBpbmNvbWluZyBjYWxsCiAgVHdpbGlvLkRldmljZS5pbmNvbWluZyhmdW5jdGlvbihjb25uZWN0aW9uKSB7CiAgICBjdXJyZW50Q29ubmVjdGlvbiA9IGNvbm5lY3Rpb247CiAgICB1cGRhdGVDYWxsU3RhdHVzKCJJbmNvbWluZyBzdXBwb3J0IGNhbGwiKTsKCiAgICAvLyBTZXQgYSBjYWxsYmFjayB0byBiZSBleGVjdXRlZCB3aGVuIHRoZSBjb25uZWN0aW9uIGlzIGFjY2VwdGVkCiAgICBjb25uZWN0aW9uLmFjY2VwdChmdW5jdGlvbigpIHsKICAgICAgdXBkYXRlQ2FsbFN0YXR1cygiSW4gY2FsbCB3aXRoIGN1c3RvbWVyIik7CiAgICAgICRhbnN3ZXJDYWxsQnV0dG9uLnByb3AoJ2Rpc2FibGVkJywgdHJ1ZSk7CiAgICAgICRoYW5ndXBDYWxsQnV0dG9uLnByb3AoJ2Rpc2FibGVkJywgZmFsc2UpOwogICAgICAkZGlhbEFnZW50MkJ1dHRvbi5wcm9wKCdkaXNhYmxlZCcsIGZhbHNlKTsKICAgIH0pOwoKICAgIC8vIFNldCBhIGNhbGxiYWNrIG9uIHRoZSBhbnN3ZXIgYnV0dG9uIGFuZCBlbmFibGUgaXQKICAgICRhbnN3ZXJDYWxsQnV0dG9uLmNsaWNrKGZ1bmN0aW9uKCkgewogICAgICBjb25uZWN0aW9uLmFjY2VwdCgpOwogICAgfSk7CiAgICAkYW5zd2VyQ2FsbEJ1dHRvbi5wcm9wKCdkaXNhYmxlZCcsIGZhbHNlKTsKICB9KTsKCiAgLyogUmVwb3J0IGFueSBlcnJvcnMgdG8gdGhlIGNhbGwgc3RhdHVzIGRpc3BsYXkgKi8KICBUd2lsaW8uRGV2aWNlLmVycm9yKGZ1bmN0aW9uIChlcnJvcikgewogICAgdXBkYXRlQ2FsbFN0YXR1cygiRVJST1I6ICIgKyBlcnJvci5tZXNzYWdlKTsKICAgIGRpc2FibGVDb25uZWN0QnV0dG9ucyhmYWxzZSk7CiAgfSk7CgogIC8vIENhbGxiYWNrIGZvciB3aGVuIHRoZSBjYWxsIGZpbmFsaXplcwogIFR3aWxpby5EZXZpY2UuZGlzY29ubmVjdChmdW5jdGlvbihjb25uZWN0aW9uKSB7CiAgICBjYWxsRW5kZWRIYW5kbGVyKGNvbm5lY3Rpb24uZGV2aWNlLl9jbGllbnROYW1lKTsKICB9KTsKCiAgZnVuY3Rpb24gZGlhbEFnZW50MigpIHsKICAgICQucG9zdCgnL2NvbmZlcmVuY2UvJyArIGN1cnJlbnRBZ2VudElkICsgJy9jYWxsJykKICB9CgogIC8qIEVuZCBhIGNhbGwgKi8KICBmdW5jdGlvbiBoYW5nVXAoKSB7CiAgICBUd2lsaW8uRGV2aWNlLmRpc2Nvbm5lY3RBbGwoKTsKICB9CgogIGZ1bmN0aW9uIGFnZW50Q2xpY2tIYW5kbGVyKGUpIHsKICAgIHZhciBhZ2VudElkID0gZS5kYXRhLmFnZW50SWQ7CiAgICBkaXNhYmxlQ29ubmVjdEJ1dHRvbnModHJ1ZSk7CiAgICBmZXRjaFRva2VuKGFnZW50SWQpOwogIH0KCiAgZnVuY3Rpb24gYWdlbnRDb25uZWN0ZWRIYW5kbGVyKGFnZW50SWQpIHsKICAgICQoJyNjb25uZWN0LWFnZW50LXJvdycpLmFkZENsYXNzKCdoaWRkZW4nKTsKICAgICQoJyNjb25uZWN0ZWQtYWdlbnQtcm93JykucmVtb3ZlQ2xhc3MoJ2hpZGRlbicpOwogICAgdXBkYXRlQ2FsbFN0YXR1cygiQ29ubmVjdGVkIGFzOiAiICsgYWdlbnRJZCk7CgogICAgaWYgKGFnZW50SWQgPT09ICdhZ2VudDEnKSB7CiAgICAgICRkaWFsQWdlbnQyQnV0dG9uLnJlbW92ZUNsYXNzKCdoaWRkZW4nKS5wcm9wKCdkaXNhYmxlZCcsIHRydWUpOwogICAgfQogICAgZWxzZSB7CiAgICAgICRkaWFsQWdlbnQyQnV0dG9uLmFkZENsYXNzKCdoaWRkZW4nKQogICAgfQogIH0KCiAgZnVuY3Rpb24gY2FsbEVuZGVkSGFuZGxlcihhZ2VudElkKSB7CiAgICAkZGlhbEFnZW50MkJ1dHRvbi5wcm9wKCdkaXNhYmxlZCcsIHRydWUpOwogICAgJGhhbmd1cENhbGxCdXR0b24ucHJvcCgnZGlzYWJsZWQnLCB0cnVlKTsKICAgICRhbnN3ZXJDYWxsQnV0dG9uLnByb3AoJ2Rpc2FibGVkJywgdHJ1ZSkKICAgIHVwZGF0ZUNhbGxTdGF0dXMoIkNvbm5lY3RlZCBhczogIiArIGFnZW50SWQpOwogIH0KCiAgZnVuY3Rpb24gZGlzYWJsZUNvbm5lY3RCdXR0b25zKGRpc2FibGUpIHsKICAgICRjb25uZWN0QWdlbnQxQnV0dG9uLnByb3AoJ2Rpc2FibGVkJywgZGlzYWJsZSk7CiAgICAkY29ubmVjdEFnZW50MkJ1dHRvbi5wcm9wKCdkaXNhYmxlZCcsIGRpc2FibGUpOwogIH0KCiAgZnVuY3Rpb24gdXBkYXRlQ2FsbFN0YXR1cyhzdGF0dXMpIHsKICAgICRjYWxsU3RhdHVzLnRleHQoc3RhdHVzKTsKICB9Cn0pOwo=</textarea>
