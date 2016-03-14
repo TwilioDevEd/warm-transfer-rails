@@ -12,7 +12,7 @@ module TwimlGenerator
   def self.generate_wait
     Twilio::TwiML::Response.new do |r|
       r.Say 'Thank you for calling. Please wait in line for a few seconds. An agent will be with you shortly.'
-      r.Play 'http://com.twilio.music.classical.s3.amazonaws.com/BusyStrings.mp3'
+      r.Play 'http://com.twilio.music.classical.s3.amazonaws.com/BusyStrings.mp3', loop: 0
     end.to_xml
   end
 end
