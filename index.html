@@ -9,10 +9,10 @@
 .wrapper {
   height:100%;
   width:100%;
-}</style><link rel="shortcut icon" href="//twilio.com/bundles/marketing/img/favicons/favicon.ico"><link rel="apple-touch-icon" href="//twilio.com/bundles/marketing/img/favicons/favicon_57.png"><link rel="apple-touch-icon" sizes="72x72" href="//twilio.com/bundles/marketing/img/favicons/favicon_72.png"><link rel="apple-touch-icon" sizes="114x114" href="//twilio.com/bundles/marketing/img/favicons/favicon_114.png"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"><link rel="stylesheet" href="viewsaurus.css"></head><body><div class="wrapper"><div id="viewsaurus" data-title="Warm Transfer"><div class="saurus-panes"><div class="saurus-prose"><div class="saurus-prose-header"><div class="title-outer"><span class="step-title">Warm Transfer</span></div></div><div class="saurus-nav-buttons"><div class="saurus-nav-button nav-overview"><div class="saurus-nav-button-inner"><i class="fa fa-fw fa-list"></i></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-previous"><div class="saurus-nav-button-inner"><a href=""> <i class="fa fa-fw fa-play fa-rotate-180"></i></a></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-next clickable"><div class="saurus-nav-button-inner"><a href="#1"> <i class="fa fa-fw fa-play"></i></a></div></div><div class="saurus-next-title"><span class="next-title-inner"></span></div></div><div class="saurus-progress-bar"></div><div class="saurus-start"><p>In this tutorial, we will learn how to implement Warm Transfers using Ruby on Rails and Twilio</p><a href="#0">Start Tutorial</a></div><div class="saurus-content"><div data-title="Setting Up The Application" class="chapter"><div data-title="What Are We Building?" data-file="config/routes.rb" class="step"><h2 id="warm-trasnfer">Warm Trasnfer</h2>
+}</style><link rel="shortcut icon" href="//twilio.com/bundles/marketing/img/favicons/favicon.ico"><link rel="apple-touch-icon" href="//twilio.com/bundles/marketing/img/favicons/favicon_57.png"><link rel="apple-touch-icon" sizes="72x72" href="//twilio.com/bundles/marketing/img/favicons/favicon_72.png"><link rel="apple-touch-icon" sizes="114x114" href="//twilio.com/bundles/marketing/img/favicons/favicon_114.png"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"><link rel="stylesheet" href="viewsaurus.css"></head><body><div class="wrapper"><div id="viewsaurus" data-title="Warm Transfer"><div class="saurus-panes"><div class="saurus-prose"><div class="saurus-prose-header"><div class="title-outer"><span class="step-title">Warm Transfer</span></div></div><div class="saurus-nav-buttons"><div class="saurus-nav-button nav-overview"><div class="saurus-nav-button-inner"><i class="fa fa-fw fa-list"></i></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-previous"><div class="saurus-nav-button-inner"><a href=""> <i class="fa fa-fw fa-play fa-rotate-180"></i></a></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-next clickable"><div class="saurus-nav-button-inner"><a href="#1"> <i class="fa fa-fw fa-play"></i></a></div></div><div class="saurus-next-title"><span class="next-title-inner"></span></div></div><div class="saurus-progress-bar"></div><div class="saurus-start"><p>In this tutorial, we will learn how to implement Warm Transfers using Ruby on Rails and Twilio</p><a href="#0">Start Tutorial</a></div><div class="saurus-content"><div data-title="Setting Up The Application" class="chapter"><div data-title="What Are We Building?" data-file="config/routes.rb" class="step"><h2 id="warm-transfer">Warm Transfer</h2>
 <p><img src="//howtodocs.s3.amazonaws.com/warm-transfers.png" alt="Warm Transfer"></p>
-<p>Have you ever been disconnected from a support call while been transfered to 
-somone else?</p>
+<p>Have you ever been disconnected from a support call while been transferred to 
+someone else?</p>
 <p>Warm transfer eliminates this problem. Using this Twilio powered 
 application you can connect with a support agent which will have the ability 
 to dial someone else in before dropping the call.</p>
@@ -28,7 +28,7 @@ to dial someone else in before dropping the call.</p>
 </li>
 <li><p>While the first agent is on the phone with the client, he/she can dial a second agent into the call.</p>
 </li>
-<li><p>Once the second agent is on the call, the first one can disconect from it.
+<li><p>Once the second agent is on the call, the first one can disconnect from it.
 The client and the second agent stay on the call.</p>
 </li>
 </ol>
@@ -40,8 +40,33 @@ will call when they want to talk to a support agent.
 <p>You need to expose your localhost using a tool like <a href="//ngrok.com/">ngrok</a>.
 Now your voice URL should look something like this:</p>
 <pre><code>https://&lt;subdomain&gt;.ngrok.io/conference/connect/client
-</code></pre><p><strong>Note:</strong> It is importantthat you use the <code>https</code> protocol because otherwise,
+</code></pre><p><strong>Note:</strong> It is important that you use the <code>https</code> protocol because otherwise,
 your browser won&#39;t allow you to use your mic.</p>
+</div><div data-title="Generate a Capability Token" data-file="lib/twilio_capability.rb" data-highlight="5-10" class="step"><h2 id="generate-a-capability-token">Generate a Capability Token</h2>
+<p>Our support agents will be available for incoming calls through a Twilio
+web client. In order for agents to connect we need to provide them with a
+<a href="//www.twilio.com/docs/client/capability-tokens">capability token</a>.</p>
+<p>When an agent goes to the home page, he/she must choose to connect as <code>agent1</code>
+or <code>agent2</code>. In order to requests a capability token, the agent must provide
+a string that will be used as the agent&#39;s identifier. For this tutorial we use
+fixed identifier strings like <code>agent1</code> and <code>agent2</code>.</p>
+<p>Before our users can make calls with Twilio Client in their browser, we
+need to provide them with a capability token.</p>
+<p>We use the <a href="//twilio-php.readthedocs.org/en/latest/">twilio-php</a>
+helper library to generate and configure our capability tokens. To allow
+our support agents to call the phone numbers on our tickets, we use the
+<code>allowClientOutgoing()</code> method.</p>
+<p>That method requires an identifier for a
+<a href="https://www.twilio.com/help/faq/twilio-client/how-do-i-create-a-twiml-app">TwiML Application</a>.
+Twilio will send a POST request to our backend every time a user makes a
+Twilio Client call — the TwiML Application tells Twilio which URL to send
+that request to.</p>
+<hr>
+<p><strong>See also:</strong></p>
+<ul>
+<li><a href="//www.twilio.com/docs/client/capability-tokens">Twilio Client: Capability Tokens</a></li>
+<li><a href="//twilio-php.readthedocs.org/en/latest/usage/token-generation.html">Generate Capability Tokens with twilio-php</a></li>
+</ul>
 </div><div data-title="Handling Incoming Calls From Clients" data-file="app/controllers/conference_controller.rb" data-highlight="6-21" class="step"><h2 id="handling-incoming-calls-from-clients">Handling Incoming Calls From Clients</h2>
 <p>When a client makes a call to our Twilio number we receive a POST request 
 asking for instructions. We&#39;ll use TwiML to instruct the client to join a
@@ -55,20 +80,38 @@ agent in.</p>
 <p>We create a <code>TwiMLResponse</code> that will contain a
 <a href="//www.twilio.com/docs/api/twiml/dial"><code>Dial</code></a> verb with a
 <a href="https://www.twilio.com/docs/api/twiml/conference"><code>Conference</code></a> noun that
-will instruct the client to connect to a specific conference room.</p>
+will instruct the client to join a specific conference room.      </p>
 </div><div data-title="Dial First Agent Into the Call" data-file="lib/caller.rb" data-highlight="3-13" class="step"><h2 id="dial-first-agent-into-the-call">Dial First Agent Into the Call</h2>
 <p>We&#39;ll use Twilio REST API client to create a new call. The <code>create</code> method
 receives a hash with the following keys:</p>
 <ol>
-<li><p><code>from</code>: </p>
+<li><p><code>from</code>: Your Twilio number</p>
 </li>
-<li><p><code>to</code>  : </p>
+<li><p><code>to</code>  : The agent web client&#39;s identifier (we&#39;ll get to this shortly)</p>
 </li>
-<li><p><code>url</code> :  </p>
+<li><p><code>url</code> : A url to ask for TwiML instructions when the call connects</p>
 </li>
 </ol>
+<p>Once the agent answers the call in the web client, a request is made to the
+callback url instructing the agent&#39;s call to join the conference room where
+the client is already waiting.</p>
+</div><div data-title="Dial First Agent Into the Call" data-file="lib/caller.rb" data-highlight="3-13" class="step"><h2 id="todo">TODO</h2>
+<p>We&#39;ll use Twilio REST API client to create a new call. The <code>create</code> method
+receives a hash with the following keys:</p>
+<ol>
+<li><p><code>from</code>: Your Twilio number</p>
+</li>
+<li><p><code>to</code>  : The agent web client&#39;s identifier</p>
+</li>
+<li><p><code>url</code> : A url to ask for TwiML instructions when the call connects</p>
+</li>
+</ol>
+<p>Once the agent answers the call in the web client, a request is made to the
+callback url instructing the agent&#39;s call to join the conference room where
+the client is already waiting.</p>
 </div></div>
 <div class="saurus-files" style="display:none;"><textarea class="saurus-file" data-file="config/routes.rb" data-mode="ruby">UmFpbHMuYXBwbGljYXRpb24ucm91dGVzLmRyYXcgZG8KICByb290ICdob21lI2luZGV4JwoKICBwb3N0ICdjb25mZXJlbmNlL3dhaXQnICAgICAgICAgICAgICAgICAgICAgICAgICAgPT4gJ2NvbmZlcmVuY2Ujd2FpdCcKICBwb3N0ICdjb25mZXJlbmNlL2Nvbm5lY3QvY2xpZW50JyAgICAgICAgICAgICAgICAgPT4gJ2NvbmZlcmVuY2UjY29ubmVjdF9jbGllbnQnCiAgcG9zdCAnY29uZmVyZW5jZS86Y29uZmVyZW5jZV9pZC9jb25uZWN0L2FnZW50MS8nID0+ICdjb25mZXJlbmNlI2Nvbm5lY3RfYWdlbnQxJywgYXM6IDpjb25mZXJlbmNlX2Nvbm5lY3RfYWdlbnQxCiAgcG9zdCAnY29uZmVyZW5jZS86Y29uZmVyZW5jZV9pZC9jb25uZWN0L2FnZW50MicgID0+ICdjb25mZXJlbmNlI2Nvbm5lY3RfYWdlbnQyJywgYXM6IDpjb25mZXJlbmNlX2Nvbm5lY3RfYWdlbnQyCiAgcG9zdCAnY29uZmVyZW5jZS86YWdlbnRfaWQvY2FsbCcgICAgICAgICAgICAgICAgID0+ICdjb25mZXJlbmNlI2NhbGxfYWdlbnQyJywgICAgYXM6IDpjb25mZXJlbmNlX2NhbGxfYWdlbnQyCgogIHBvc3QgJzphZ2VudF9pZC90b2tlbicgICAgICAgICAgICAgICAgICAgICAgICAgICA9PiAndG9rZW4jZ2VuZXJhdGUnCgplbmQK</textarea>
+<textarea class="saurus-file" data-file="lib/twilio_capability.rb" data-mode="ruby">bW9kdWxlIFR3aWxpb0NhcGFiaWxpdHkKICBkZWYgc2VsZi5nZW5lcmF0ZShhZ2VudF9pZCkKICAgICMgVG8gZmluZCBUV0lMSU9fQUNDT1VOVF9TSUQsIFRXSUxJT19BVVRIX1RPS0VOIHZpc2l0CiAgICAjIGh0dHBzOi8vd3d3LnR3aWxpby5jb20vdXNlci9hY2NvdW50CiAgICBhY2NvdW50X3NpZCA9IEVOVlsnVFdJTElPX0FDQ09VTlRfU0lEJ10KICAgIGF1dGhfdG9rZW4gID0gRU5WWydUV0lMSU9fQVVUSF9UT0tFTiddCiAgICBjYXBhYmlsaXR5ID0gVHdpbGlvOjpVdGlsOjpDYXBhYmlsaXR5Lm5ldyhhY2NvdW50X3NpZCwgYXV0aF90b2tlbikKCiAgICBjYXBhYmlsaXR5LmFsbG93X2NsaWVudF9pbmNvbWluZyhhZ2VudF9pZCkKICAgIGNhcGFiaWxpdHkuZ2VuZXJhdGUKICBlbmQKZW5kCg==</textarea>
 <textarea class="saurus-file" data-file="app/controllers/conference_controller.rb" data-mode="ruby">Y2xhc3MgQ29uZmVyZW5jZUNvbnRyb2xsZXIgPCBBcHBsaWNhdGlvbkNvbnRyb2xsZXIKICBza2lwX2JlZm9yZV9maWx0ZXIgOnZlcmlmeV9hdXRoZW50aWNpdHlfdG9rZW4KCiAgQUdFTlRfV0FJVF9VUkwgPSAnaHR0cDovL3R3aW1sZXRzLmNvbS9ob2xkbXVzaWM/QnVja2V0PWNvbS50d2lsaW8ubXVzaWMuY2xhc3NpY2FsJwoKICBkZWYgY29ubmVjdF9jbGllbnQKICAgIGFnZW50X2lkID0gJ2FnZW50MScKICAgIGNvbmZlcmVuY2VfaWQgPSBwYXJhbXNbOkNhbGxTaWRdCiAgICBDYWxsZXIKICAgICAgLmNhbGxfYWdlbnQoYWdlbnRfaWQsIGNvbmZlcmVuY2VfY29ubmVjdF9hZ2VudDFfdXJsKGNvbmZlcmVuY2VfaWQ6IGNvbmZlcmVuY2VfaWQpKQoKICAgIHR3aW1sID0gVHdpbWxHZW5lcmF0b3IKICAgICAgLmdlbmVyYXRlX2Nvbm5lY3RfY29uZmVyZW5jZShjb25mZXJlbmNlX2lkLCBjb25mZXJlbmNlX3dhaXRfdXJsLCBmYWxzZSwgdHJ1ZSkKCiAgICBjYWxsID0gQWN0aXZlQ2FsbAogICAgICAud2l0aF9hZ2VudF9pZChhZ2VudF9pZCkuZmlyc3Rfb3JfY3JlYXRlKGNvbmZlcmVuY2VfaWQ6IGNvbmZlcmVuY2VfaWQpCiAgICBjYWxsLmNvbmZlcmVuY2VfaWQgPSBjb25mZXJlbmNlX2lkCiAgICBjYWxsLnNhdmUhCgogICAgcmVuZGVyIHhtbDogdHdpbWwKICBlbmQKCiAgZGVmIGNvbm5lY3RfYWdlbnQxCiAgICB0d2ltbCA9IFR3aW1sR2VuZXJhdG9yCiAgICAgIC5nZW5lcmF0ZV9jb25uZWN0X2NvbmZlcmVuY2UocGFyYW1zWzpjb25mZXJlbmNlX2lkXSwgQUdFTlRfV0FJVF9VUkwsIHRydWUsIGZhbHNlKQogICAgcmVuZGVyIHhtbDogdHdpbWwKICBlbmQKCiAgZGVmIGNvbm5lY3RfYWdlbnQyCiAgICB0d2ltbCA9IFR3aW1sR2VuZXJhdG9yCiAgICAgIC5nZW5lcmF0ZV9jb25uZWN0X2NvbmZlcmVuY2UocGFyYW1zWzpjb25mZXJlbmNlX2lkXSwgQUdFTlRfV0FJVF9VUkwsIHRydWUsIHRydWUpCiAgICByZW5kZXIgeG1sOiB0d2ltbAogIGVuZAoKICBkZWYgY2FsbF9hZ2VudDIKICAgIGFnZW50X2lkID0gcGFyYW1zWzphZ2VudF9pZF0KICAgIGNvbmZlcmVuY2VfaWQgPSBBY3RpdmVDYWxsLndoZXJlKGFnZW50X2lkOiBhZ2VudF9pZCkuZmlyc3QuY29uZmVyZW5jZV9pZAoKICAgIENhbGxlcgogICAgICAuY2FsbF9hZ2VudCgnYWdlbnQyJywgY29uZmVyZW5jZV9jb25uZWN0X2FnZW50Ml91cmwoY29uZmVyZW5jZV9pZDogY29uZmVyZW5jZV9pZCkpCiAgICByZW5kZXIgbm90aGluZzogdHJ1ZQogIGVuZAoKICBkZWYgd2FpdAogICAgdHdpbWwgPSBUd2ltbEdlbmVyYXRvci5nZW5lcmF0ZV93YWl0KCkKICAgIHJlbmRlciB4bWw6IHR3aW1sCiAgZW5kCmVuZAo=</textarea>
 <textarea class="saurus-file" data-file="lib/twiml_generator.rb" data-mode="ruby">bW9kdWxlIFR3aW1sR2VuZXJhdG9yCiAgZGVmIHNlbGYuZ2VuZXJhdGVfY29ubmVjdF9jb25mZXJlbmNlKGNhbGxfc2lkLCB3YWl0X3VybCwgc3RhcnRfb25fZW50ZXIsIGVuZF9vbl9leGl0KQogICAgVHdpbGlvOjpUd2lNTDo6UmVzcG9uc2UubmV3IGRvIHxyfAogICAgICByLkRpYWwgZG8gfGR8CiAgICAgICAgZC5Db25mZXJlbmNlIGNhbGxfc2lkLCBzdGFydENvbmZlcmVuY2VPbkVudGVyOiBzdGFydF9vbl9lbnRlciwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVuZENvbmZlcmVuY2VPbkV4aXQ6IGVuZF9vbl9leGl0LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgd2FpdFVybDogd2FpdF91cmwKICAgICAgZW5kCiAgICBlbmQudG9feG1sCiAgZW5kCgogIGRlZiBzZWxmLmdlbmVyYXRlX3dhaXQKICAgIFR3aWxpbzo6VHdpTUw6OlJlc3BvbnNlLm5ldyBkbyB8cnwKICAgICAgci5TYXkgJ1RoYW5rIHlvdSBmb3IgY2FsbGluZy4gUGxlYXNlIHdhaXQgaW4gbGluZSBmb3IgYSBmZXcgc2Vjb25kcy4gQW4gYWdlbnQgd2lsbCBiZSB3aXRoIHlvdSBzaG9ydGx5LicKICAgICAgci5QbGF5ICdodHRwOi8vY29tLnR3aWxpby5tdXNpYy5jbGFzc2ljYWwuczMuYW1hem9uYXdzLmNvbS9CdXN5U3RyaW5ncy5tcDMnCiAgICBlbmQudG9feG1sCiAgZW5kCmVuZAo=</textarea>
 <textarea class="saurus-file" data-file="lib/caller.rb" data-mode="ruby">bW9kdWxlIENhbGxlcgogIGRlZiBzZWxmLmNhbGxfYWdlbnQoYWdlbnRfaWQsIGNhbGxiYWNrX3VybCkKICAgIGFjY291bnRfc2lkICAgPSBFTlZbJ1RXSUxJT19BQ0NPVU5UX1NJRCddCiAgICBhdXRoX3Rva2VuICAgID0gRU5WWydUV0lMSU9fQVVUSF9UT0tFTiddCiAgICB0d2lsaW9fbnVtYmVyID0gRU5WWydUV0lMSU9fTlVNQkVSJ10KCiAgICBjbGllbnQgPSBUd2lsaW86OlJFU1Q6OkNsaWVudC5uZXcoYWNjb3VudF9zaWQsIGF1dGhfdG9rZW4pCgogICAgY2FsbCA9IGNsaWVudC5hY2NvdW50LmNhbGxzLmNyZWF0ZSgKICAgICAgZnJvbTogdHdpbGlvX251bWJlciwKICAgICAgdG86ICJjbGllbnQ6I3thZ2VudF9pZH0iLAogICAgICB1cmw6IGNhbGxiYWNrX3VybAogICAgKQogIGVuZAplbmQK</textarea>
