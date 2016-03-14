@@ -30,7 +30,6 @@
 
       Let's get started!
 
-      
   .step(
     data-title="Setting Up Voice Web Hook",
     data-file='config/routes.rb',
@@ -53,6 +52,34 @@
       your browser won't allow you to use your mic.
 
   .step(
+    data-title="Connecting as a Support Agent",
+    data-file='app/assets/javascripts/main.js',
+    data-highlight='17-51')
+    :markdown
+      ## Connecting as a Support Agent
+
+      Our support agents will be available for incoming calls through our web 
+      application using a [Twilio Voice Web Client](//www.twilio.com/webrtc).
+      
+      When an agent goes to the home page, he/she must choose to connect as `agent1`
+      or `agent2`. Then a capability token is requested
+      in order to set up our Twilio web client and make it available 
+      to receive phone calls. `Twilio.Device.ready` callback is used to update 
+      the UI once the client has been set up.
+      
+      `Twilio.Device.incoming` callback is invoked when the client receives an incoming call.
+      This is where the call is actually connected to the client and it is as simple as
+      calling the `accept` method on the incoming connection.
+      
+      ---
+
+      **See also:**
+
+      * [Twilio.js Library](//www.twilio.com/docs/api/client/twilio-js)
+      * [Twilio Client Quickstart](//www.twilio.com/docs/quickstart/client)
+
+  
+  .step(
     data-title="Generate a Capability Token",
     data-file='lib/twilio_capability.rb',
     data-highlight='5-10')
@@ -73,23 +100,7 @@
       **See also:**
 
       * [Twilio Client: Capability Tokens](//www.twilio.com/docs/client/capability-tokens)
-      * [Generate Capability Tokens with twilio-php](//twilio-ruby.readthedocs.org/en/latest/usage/token-generation.html)
-
-  .step(
-    data-title="Using Twilio's Web Client",
-    data-file='app/assets/javascripts/main.js',
-    data-highlight='5-10')
-    :markdown
-      ## Generate a Capability Token
-
-      Our support agents will be available for incoming calls through a Twilio
-      web client. In order for agents to connect we need to provide them with a
-      [capability token](//www.twilio.com/docs/client/capability-tokens).
-      
-      When an agent goes to the home page, he/she must choose to connect as `agent1`
-      or `agent2`. In order to requests a capability token, the agent must provide
-      a string that will be used as the agent's identifier. For this tutorial we use
-      fixed identifier strings like `agent1` and `agent2`.
+      * [Generate Capability Tokens with twilio-ruby](//twilio-ruby.readthedocs.org/en/latest/usage/token-generation.html)
 
   .step(
     data-title="Handling Incoming Calls From Clients",
