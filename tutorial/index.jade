@@ -6,30 +6,30 @@
       ## Warm Transfer
       ![Warm Transfer](//howtodocs.s3.amazonaws.com/warm-transfers.png)
 
-      Have you ever been disconnected from a support call while been transferred to 
+      Have you ever been disconnected from a support call while been transferred to
       someone else?
-      
-      Warm transfer eliminates this problem. Using this Twilio powered 
-      application you can connect with a support agent which will have the ability 
+
+      Warm transfer eliminates this problem. Using this Twilio powered
+      application you can connect with a support agent that will have the ability
       to dial someone else in before dropping the call.
-      
+
       Here is how it works at a high level:
-      
+
       1. The first agent becomes available when he/she connects through the web client.
-      
+
       1. The second agent also becomes available when he/she connects through the web client.
 
       1. A client calls our support line.
-      
+
       1. The client stays on hold while the first joins the call.
-      
+
       1. While the first agent is on the phone with the client, he/she can dial a second agent into the call.
-      
+
       1. Once the second agent is on the call, the first one can disconnect from it.
       The client and the second agent stay on the call.
 
       Let's get started!
-      
+
       ---
 
       **See Also:**
@@ -42,18 +42,18 @@
     data-highlight='5-5')
     :markdown
       ## Setting Up Voice Web Hook
-      
+
       You will need to configure the voice webhook of the Twilio number that clients
-      will call when they want to talk to a support agent.
+      will dial when they want to talk to a support agent.
       ![Configure Voice](//howtodocs.s3.amazonaws.com/twilio-number-config-all-med.gif)
-      
+
       You need to expose your localhost using a tool like [ngrok](//ngrok.com/).
       Now your voice URL should look something like this:
-      
+
       ```
       https://<subdomain>.ngrok.io/conference/connect/client
       ```
-      
+
       **Note:** It is important that you use the `https` protocol because otherwise,
       your browser won't allow you to use your mic.
 
@@ -64,21 +64,21 @@
     :markdown
       ## Connecting as a Support Agent
 
-      Our support agents will be available for incoming calls through our web 
+      Our support agents will be available for incoming calls through our web
       application using a [Twilio Voice Web Client](//www.twilio.com/webrtc).
-      
+
       When an agent goes to the home page, he/she must choose to connect as `agent1`
       or `agent2`. Then a capability token is requested
-      in order to set up our Twilio web client and make it available 
-      to receive phone calls. `Twilio.Device.ready` callback is used to update 
+      in order to set up our Twilio web client and make it available
+      to receive phone calls. `Twilio.Device.ready` callback is used to update
       the UI once the client has been set up.
-      
+
       `Twilio.Device.incoming` callback gets invoked when the client receives an incoming call.
       This is where the call is actually connected to the client and it is as simple as
       calling the `accept` method on the incoming connection.
-      
+
       In the next step we'll take a closer look into capability token generation.
-      
+
       ---
 
       **See also:**
@@ -86,7 +86,7 @@
       * [Twilio.js Library](//www.twilio.com/docs/api/client/twilio-js)
       * [Twilio Client Quickstart](//www.twilio.com/docs/quickstart/client)
       * [TwiML response with the twilio-ruby library](https://www.twilio.com/docs/quickstart/ruby/twiml)
-  
+
   .step(
     data-title="Generate a Capability Token",
     data-file='lib/twilio_capability.rb',
@@ -96,7 +96,7 @@
 
       In order to connect the [Twilio Voice Web Client](//www.twilio.com/webrtc)
       we need a [capability token](//www.twilio.com/docs/client/capability-tokens).
-      
+
       To allow incoming connections through the web client an identifier must be
       provided when generating the token. For this tutorial we used fixed identifier
       strings like `agent1` and `agent2`. These identifiers will be used to create
@@ -116,89 +116,89 @@
     data-highlight='6-21')
     :markdown
       ## Handling Incoming Calls From Clients
-      
-      When a client makes a call to our Twilio number the application receives 
+
+      When a client makes a call to our Twilio number the application receives
       a POST request asking for instructions. We'll use TwiML to instruct the client
-      to join a conference room and the Twilio REST API client to start a call to
+      to join a conference room and the Twilio REST API client to start a call with
       the first agent, so he can join the same conference.
-      
+
       When providing instructions to the client, we also provide a
       [`waitUrl`](//www.twilio.com/docs/api/twiml/conference#attributes-waitUrl),
       which in our case is another end point of our application. This returns more TwiML
       to [say](//www.twilio.com/docs/api/twiml/say) welcome to the user, and also
-      to [play](//www.twilio.com/docs/api/twiml/play) some music while on hold.
+      [play](//www.twilio.com/docs/api/twiml/play) some music while on hold.
       Take a look at the code
       [here](//github.com/TwilioDevEd/warm-transfer-rails/blob/c159c91210a7971c1c0d564bc38594a4ce378c70/lib/twiml_generator.rb#L12-L17)
-      
-      We use the client's `CallSid` as the conference identifier all the participants
+
+      We use the client's `CallSid` as the conference identifier. All the participants
       require to join the conference room. That's why this identifier is stored in a
       database. This way the conference identifier can be used later to dial the second
       agent in.
-      
+
   .step(
     data-title="Providing TwiML Instruction For The Client",
     data-file='lib/twiml_generator.rb',
     data-highlight='2-10')
     :markdown
       ## Providing TwiML Instruction For The Client
-      
+
       We create a `TwiMLResponse` that will contain a
       [`Dial`](//www.twilio.com/docs/api/twiml/dial) verb with a
       [`Conference`](https://www.twilio.com/docs/api/twiml/conference) noun that
-      will instruct the client to join a specific conference room.      
-  
+      will instruct the client to join a specific conference room.
+
   .step(
     data-title='Dial First Agent Into the Call',
     data-file='lib/caller.rb',
     data-highlight='3-13')
     :markdown
       ## Dial First Agent Into the Call
-        
+
       This application uses an abstraction for the purpose of dialing agents in.
       A Twilio REST API client is used to create a new call. The `create` method
       receives a hash with the following keys:
-      
+
       1. `from`: Your Twilio number
-      
+
       1. `to`  : The agent web client's identifier (`agent1` or `agent2`)
-      
+
       1. `url` : A url to ask for TwiML instructions when the call connects
-      
+
       Once the agent answers the call in the web client, a request is made to the
       callback url instructing the agent's call to join the conference room where
       the client is already waiting.
-      
+
   .step(
     data-title='Dial Second Agent Into the Call',
     data-file='app/controllers/conference_controller.rb',
     data-highlight='35-42')
     :markdown
       ## Dial Second Agent Into the Call
-        
-      When the client and the first agents are both in the call we are ready to 
-      perform a *warm  transfer* to a second agent. The first agent makes a 
+
+      When the client and the first agents are both in the call we are ready to
+      perform a *warm  transfer* to a second agent. The first agent makes a
       request passing its `identifier` to allow us to look for the `conference_id`
-      we should use to dial the second agent in. For this purpose we'll use the 
-      `Caller` abstraction as done before. 
-      
+      needed to dial the second agent in. For this purpose we'll use the
+      `Caller` abstraction as done before.
+
   .step(
     data-title='The First Agent Leaves the Call',
     data-file='lib/twiml_generator.rb',
     data-highlight='3-9')
     :markdown
       ## The First Agent Leaves the Call
-      
+
       When the three participants have joined the same call, the first agent has
       served his purpose. Now he can drop the call, leaving agent two and the client
       to have a pleasant conversation.
-      
+
       It is important to notice the differences between the TwiML each one of the
       participants received when joining the call. Both, agent one and two, have
       `startConferenceOnEnter` set to `true`. This means the conference will start when
-      any of them join the call. For the client calling and agent two, `endConferenceOnExit`
+      any of them joins the call. For the client calling and for agent two, `endConferenceOnExit`
       is set to true. This causes the call to end when any of this two participants
       drop the call.
-      
+
   .step
     :markdown
       ## Where to next?
@@ -221,5 +221,3 @@
       Thanks for checking out this tutorial! If you have any feedback
       to share with us, we'd love to hear it.
       [Contact support](//www.twilio.com/help/contact) to let us know what you think.
-
-      
