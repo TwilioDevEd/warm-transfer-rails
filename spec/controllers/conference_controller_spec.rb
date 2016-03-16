@@ -23,8 +23,7 @@ RSpec.describe ConferenceController, type: :controller do
   end
 
   describe '#connect_agent1' do
-    it "returns Dial Conference TwiML" do
-
+    it 'returns Dial Conference TwiML' do
       expect(TwimlGenerator).to receive(:generate_connect_conference)
         .with(conference_id, agent_wait_url, true, false)
         .once
@@ -37,7 +36,7 @@ RSpec.describe ConferenceController, type: :controller do
   end
 
   describe '#connect_agent2' do
-    it "returns Dial Conference TwiML" do
+    it 'returns Dial Conference TwiML' do
 
       expect(TwimlGenerator).to receive(:generate_connect_conference)
         .with(conference_id, agent_wait_url, true, true)
@@ -51,10 +50,10 @@ RSpec.describe ConferenceController, type: :controller do
   end
 
   describe '#call_agent2' do
-    it "creates a call to agent 2" do
+    it 'creates a call to agent 2' do
       ActiveCall.create(agent_id: 'agent1', conference_id: conference_id)
       expect(Caller).to receive(:call_agent)
-        .with("agent2", conference_connect_agent2_url(conference_id: conference_id))
+        .with('agent2', conference_connect_agent2_url(conference_id: conference_id))
         .once
 
       post :call_agent2, agent_id: 'agent1'
@@ -64,8 +63,7 @@ RSpec.describe ConferenceController, type: :controller do
   end
 
   describe '#wait' do
-    it "returns Dial Conference TwiML" do
-
+    it 'returns Dial Conference TwiML' do
       expect(TwimlGenerator).to receive(:generate_wait)
         .once
         .and_return('<Response></Response>')

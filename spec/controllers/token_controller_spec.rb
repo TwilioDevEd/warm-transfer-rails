@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe TokenController, type: :controller do
   describe '#generate' do
     agent_id = 'agent'
-    it "generates a capability token" do
+    it 'generates a capability token' do
       expect(TwilioCapability).to receive(:generate)
         .with(agent_id)
         .once
