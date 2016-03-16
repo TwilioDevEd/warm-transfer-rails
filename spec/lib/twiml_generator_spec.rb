@@ -8,8 +8,7 @@ describe TwimlGenerator do
       call_sid = 'CallSID'
       url = 'http://www.example.com'
 
-      xml_string = described_class
-        .generate_connect_conference(call_sid, url, true, false)
+      xml_string = described_class.generate_connect_conference(call_sid, url, true, false)
       document = Nokogiri::XML(xml_string)
 
       dial_node = document.root.child
