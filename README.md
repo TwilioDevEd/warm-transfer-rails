@@ -51,8 +51,7 @@ This project is built using the [Ruby on Rails](http://rubyonrails.org/) web fra
    $ bundle exec rails s
    ```
 
-1. Expose your application to the wider internet using [ngrok](http://ngrok.com). You can click
-  [here](#expose-the-application-to-the-wider-internet) for more details. This step
+1. Expose your application to the wider internet using [ngrok](http://ngrok.com). This step
   is important because the application won't work as expected if you run it through
   localhost.
 
@@ -62,6 +61,9 @@ This project is built using the [Ruby on Rails](http://rubyonrails.org/) web fra
 
   Once ngrok is running, open up your browser and go to your ngrok URL. It will
   look something like this: `http://9a159ccf.ngrok.io`
+
+  You can read [this blog post](https://www.twilio.com/blog/2015/09/6-awesome-reasons-to-use-ngrok-when-testing-webhooks.html)
+  for more details on how to use ngrok.
 
 1. Configure Twilio to call your webhooks
 
@@ -75,20 +77,6 @@ This project is built using the [Ruby on Rails](http://rubyonrails.org/) web fra
 
 
 That's it!
-
-### Expose the Application to the Wider Internet
-
-If you want your application to be accessible from the internet, you can either
-forward the necessary ports in your router, or use a tool like
-[ngrok](https://ngrok.com/) that will expose your local host to the internet.
-
-You can read [this blog post](https://www.twilio.com/blog/2015/09/6-awesome-reasons-to-use-ngrok-when-testing-webhooks.html)
-for more details on how to use ngrok. If you are using version 2.x, exposing
-a specific port should be easily done with the following command:
-
-```bash
-$ ngrok http 3000
-```
 
 ## Meta
 
