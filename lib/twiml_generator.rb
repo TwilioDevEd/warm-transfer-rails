@@ -1,8 +1,8 @@
 module TwimlGenerator
-  def self.generate_connect_conference(call_sid, wait_url, start_on_enter, end_on_exit)
+  def self.generate_connect_conference(conference_id, wait_url, start_on_enter, end_on_exit)
     Twilio::TwiML::Response.new do |r|
       r.Dial do |d|
-        d.Conference call_sid, startConferenceOnEnter: start_on_enter,
+        d.Conference conference_id, startConferenceOnEnter: start_on_enter,
                                endConferenceOnExit: end_on_exit,
                                waitUrl: wait_url
       end
