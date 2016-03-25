@@ -6,12 +6,12 @@
       ## Warm Transfer
       ![Warm Transfer](//howtodocs.s3.amazonaws.com/warm-transfers.png)
 
-      Have you ever been disconnected from a support call while been transferred to
+      Have you ever been disconnected from a support call while being transferred to
       someone else?
 
-      Warm transfer eliminates this problem. Using this Twilio powered
-      application you can connect with a support agent that will have the ability
-      to dial someone else in before dropping the call.
+      Warm transfer eliminates this problem. Using Twilio powered
+      warm transfers your agents will have the ability
+      to dial in another agent in realtime.
 
       Here is how it works at a high level:
 
@@ -21,7 +21,7 @@
 
       1. A client calls our support line.
 
-      1. The client stays on hold while the first joins the call.
+      1. The client stays on hold while the first agent joins the call.
 
       1. While the first agent is on the phone with the client, he/she can dial a second agent into the call.
 
@@ -43,41 +43,29 @@
     :markdown
       ## Setting Up Voice Web Hook
 
-      You will need to configure the voice webhook of the Twilio number that clients
+      First let's configure the voice webhook for the Twilio number that customers
       will dial when they want to talk to a support agent.
       ![Configure Voice](//howtodocs.s3.amazonaws.com/twilio-number-config-all-med.gif)
 
-      You need to expose your localhost using a tool like [ngrok](//ngrok.com/).
-      Now your voice URL should look something like this:
-
-      ```
-      https://<subdomain>.ngrok.io/conference/connect/client
-      ```
-
-      **Note:** It is important that you use the `https` protocol because otherwise,
-      your browser won't allow you to use your mic.
+      This should be the public-facing url or your app in production.
 
   .step(
     data-title="Connecting as a Support Agent",
     data-file='app/assets/javascripts/main.js',
     data-highlight='17-51')
     :markdown
-      ## Connecting as a Support Agent
+      ## Connecting an Agent
 
-      Our support agents will be available for incoming calls through our web
-      application using a [Twilio Voice Web Client](//www.twilio.com/webrtc).
+      Here you can see all front-end code necessary to connect an agent using
+      [Twilio's Voice Web Client](//www.twilio.com/webrtc).
 
-      When an agent goes to the home page, he/she must choose to connect as `agent1`
-      or `agent2`. Then a capability token is requested
-      in order to set up our Twilio web client and make it available
-      to receive phone calls. `Twilio.Device.ready` callback is used to update
-      the UI once the client has been set up.
+      We essentially need three things to have a live web client:
+      * A capability token (provided by our Rails app)
+      * A unique identifier (string) for each agent
+      * Event listeners to handle different Twilio-triggered events
 
-      `Twilio.Device.incoming` callback gets invoked when the client receives an incoming call.
-      This is where the call is actually connected to the client and it is as simple as
-      calling the `accept` method on the incoming connection.
-
-      In the next step we'll take a closer look into capability token generation.
+      In the next step we'll take a closer look into capability token
+      generation.
 
       ---
 
@@ -97,10 +85,12 @@
       In order to connect the [Twilio Voice Web Client](//www.twilio.com/webrtc)
       we need a [capability token](//www.twilio.com/docs/client/capability-tokens).
 
-      To allow incoming connections through the web client an identifier must be
-      provided when generating the token. For this tutorial we used fixed identifier
-      strings like `agent1` and `agent2`. These identifiers will be used to create
-      outbound calls to the specified agent using the [Twilio REST API](//www.twilio.com/docs/api/rest).
+      To allow incoming connections through the web client an identifier must
+      be provided when generating the token. For this tutorial we used fixed
+      identifier strings like `agent1` and `agent2` but you can use any
+      generated string for your call center clients. These identifiers will be
+      used to create outbound calls to the specified agent using the [Twilio
+      REST API](//www.twilio.com/docs/api/rest).
 
       ---
 
@@ -115,10 +105,10 @@
     data-file='app/controllers/conference_controller.rb',
     data-highlight='6-28')
     :markdown
-      ## Handling Incoming Calls From Clients
+      ## Handling Incoming Calls
 
       When a client makes a call to our Twilio number the application receives
-      a POST request asking for instructions. We'll use TwiML to instruct the client
+      a POST request asking for instructions. We'll use [TwiML](//www.twilio.com/docs/api/twiml/) to instruct the client
       to join a conference room and the Twilio REST API client to start a call with
       the first agent, so he can join the same conference.
 
@@ -130,10 +120,8 @@
       Take a look at the code
       [here](//github.com/TwilioDevEd/warm-transfer-rails/blob/c159c91210a7971c1c0d564bc38594a4ce378c70/lib/twiml_generator.rb#L12-L17)
 
-      We use the client's `CallSid` as the conference identifier. All the participants
-      require to join the conference room. That's why this identifier is stored in a
-      database. This way the conference identifier can be used later to dial the second
-      agent in.
+      We use the client's [`CallSid`](//www.twilio.com/help/faq/voice/what-is-a-call-sid) as the conference identifier. Since all participants
+      need this identifier to join the conference we'll need to store it in a databse so that we can grab it when we dial the second agent in later.
 
   .step(
     data-title="Providing TwiML Instruction For The Client",
@@ -142,20 +130,19 @@
     :markdown
       ## Providing TwiML Instruction For The Client
 
-      We create a `TwiMLResponse` that will contain a
+      Here we create a `TwiMLResponse` that will contain a
       [`Dial`](//www.twilio.com/docs/api/twiml/dial) verb with a
       [`Conference`](https://www.twilio.com/docs/api/twiml/conference) noun that
       will instruct the client to join a specific conference room.
 
   .step(
     data-title='Dial First Agent Into the Call',
-    data-file='lib/caller.rb',
-    data-highlight='3-13')
+    data-file='lib/caller.rb')
     :markdown
       ## Dial First Agent Into the Call
 
-      This application uses an abstraction for the purpose of dialing agents in.
-      A Twilio REST API client is used to create a new call. The `create` method
+      For our app we created a `Caller` module to handle dialing our agents. This module uses
+      Twilio's REST API to create a new call. The `create` method
       receives a hash with the following keys:
 
       1. `from`: Your Twilio number
@@ -175,11 +162,10 @@
     :markdown
       ## Dial Second Agent Into the Call
 
-      When the client and the first agents are both in the call we are ready to
+      When the client and the first agent are both in the call we are ready to
       perform a *warm  transfer* to a second agent. The first agent makes a
       request passing its `identifier` to allow us to look for the `conference_id`
-      needed to dial the second agent in. For this purpose we'll use the
-      `Caller` abstraction as done before.
+      needed to dial the second agent in. Since we already have a `Caller` module we can simply use the `call_agent` instance method to connect the second agent.
 
   .step(
     data-title='The First Agent Leaves the Call',
@@ -196,7 +182,7 @@
       participants received when joining the call. Both, agent one and two, have
       `startConferenceOnEnter` set to `true`. This means the conference will start when
       any of them joins the call. For the client calling and for agent two, `endConferenceOnExit`
-      is set to true. This causes the call to end when any of this two participants
+      is set to true. This causes the call to end when either of these two participants
       drop the call.
 
   .step

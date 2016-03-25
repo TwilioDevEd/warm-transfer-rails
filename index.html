@@ -11,11 +11,11 @@
   width:100%;
 }</style><link rel="shortcut icon" href="//twilio.com/bundles/marketing/img/favicons/favicon.ico"><link rel="apple-touch-icon" href="//twilio.com/bundles/marketing/img/favicons/favicon_57.png"><link rel="apple-touch-icon" sizes="72x72" href="//twilio.com/bundles/marketing/img/favicons/favicon_72.png"><link rel="apple-touch-icon" sizes="114x114" href="//twilio.com/bundles/marketing/img/favicons/favicon_114.png"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"><link rel="stylesheet" href="viewsaurus.css"></head><body><div class="wrapper"><div id="viewsaurus" data-title="Warm Transfer"><div class="saurus-panes"><div class="saurus-prose"><div class="saurus-prose-header"><div class="title-outer"><span class="step-title">Warm Transfer</span></div></div><div class="saurus-nav-buttons"><div class="saurus-nav-button nav-overview"><div class="saurus-nav-button-inner"><i class="fa fa-fw fa-list"></i></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-previous"><div class="saurus-nav-button-inner"><a href=""> <i class="fa fa-fw fa-play fa-rotate-180"></i></a></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-next clickable"><div class="saurus-nav-button-inner"><a href="#1"> <i class="fa fa-fw fa-play"></i></a></div></div><div class="saurus-next-title"><span class="next-title-inner"></span></div></div><div class="saurus-progress-bar"></div><div class="saurus-start"><p>In this tutorial, we will learn how to implement Warm Transfers using Ruby on Rails and Twilio</p><a href="#0">Start Tutorial</a></div><div class="saurus-content"><div data-title="Setting Up The Application" class="chapter"><div data-title="What Are We Building?" data-file="config/routes.rb" class="step"><h2 id="warm-transfer">Warm Transfer</h2>
 <p><img src="//howtodocs.s3.amazonaws.com/warm-transfers.png" alt="Warm Transfer"></p>
-<p>Have you ever been disconnected from a support call while been transferred to
+<p>Have you ever been disconnected from a support call while being transferred to
 someone else?</p>
-<p>Warm transfer eliminates this problem. Using this Twilio powered
-application you can connect with a support agent that will have the ability
-to dial someone else in before dropping the call.</p>
+<p>Warm transfer eliminates this problem. Using Twilio powered
+warm transfers your agents will have the ability
+to dial in another agent in realtime.</p>
 <p>Here is how it works at a high level:</p>
 <ol>
 <li><p>The first agent becomes available when he/she connects through the web client.</p>
@@ -24,7 +24,7 @@ to dial someone else in before dropping the call.</p>
 </li>
 <li><p>A client calls our support line.</p>
 </li>
-<li><p>The client stays on hold while the first joins the call.</p>
+<li><p>The client stays on hold while the first agent joins the call.</p>
 </li>
 <li><p>While the first agent is on the phone with the client, he/she can dial a second agent into the call.</p>
 </li>
@@ -40,26 +40,21 @@ The client and the second agent stay on the call.</p>
 <li><a href="//twilio-ruby.readthedocs.org/en/latest/index.html#getting-started">Getting started with the Twilio Ruby gem</a></li>
 </ul>
 </div><div data-title="Setting Up Voice Web Hook" data-file="config/routes.rb" data-highlight="5-5" class="step"><h2 id="setting-up-voice-web-hook">Setting Up Voice Web Hook</h2>
-<p>You will need to configure the voice webhook of the Twilio number that clients
+<p>First let&#39;s configure the voice webhook for the Twilio number that customers
 will dial when they want to talk to a support agent.
 <img src="//howtodocs.s3.amazonaws.com/twilio-number-config-all-med.gif" alt="Configure Voice"></p>
-<p>You need to expose your localhost using a tool like <a href="//ngrok.com/">ngrok</a>.
-Now your voice URL should look something like this:</p>
-<pre><code>https://&lt;subdomain&gt;.ngrok.io/conference/connect/client
-</code></pre><p><strong>Note:</strong> It is important that you use the <code>https</code> protocol because otherwise,
-your browser won&#39;t allow you to use your mic.</p>
-</div><div data-title="Connecting as a Support Agent" data-file="app/assets/javascripts/main.js" data-highlight="17-51" class="step"><h2 id="connecting-as-a-support-agent">Connecting as a Support Agent</h2>
-<p>Our support agents will be available for incoming calls through our web
-application using a <a href="//www.twilio.com/webrtc">Twilio Voice Web Client</a>.</p>
-<p>When an agent goes to the home page, he/she must choose to connect as <code>agent1</code>
-or <code>agent2</code>. Then a capability token is requested
-in order to set up our Twilio web client and make it available
-to receive phone calls. <code>Twilio.Device.ready</code> callback is used to update
-the UI once the client has been set up.</p>
-<p><code>Twilio.Device.incoming</code> callback gets invoked when the client receives an incoming call.
-This is where the call is actually connected to the client and it is as simple as
-calling the <code>accept</code> method on the incoming connection.</p>
-<p>In the next step we&#39;ll take a closer look into capability token generation.</p>
+<p>This should be the public-facing url or your app in production.</p>
+</div><div data-title="Connecting as a Support Agent" data-file="app/assets/javascripts/main.js" data-highlight="17-51" class="step"><h2 id="connecting-an-agent">Connecting an Agent</h2>
+<p>Here you can see all front-end code necessary to connect an agent using
+<a href="//www.twilio.com/webrtc">Twilio&#39;s Voice Web Client</a>.</p>
+<p>We essentially need three things to have a live web client:</p>
+<ul>
+<li>A capability token (provided by our Rails app)</li>
+<li>A unique identifier (string) for each agent</li>
+<li>Event listeners to handle different Twilio-triggered events</li>
+</ul>
+<p>In the next step we&#39;ll take a closer look into capability token
+generation.</p>
 <hr>
 <p><strong>See also:</strong></p>
 <ul>
@@ -70,10 +65,12 @@ calling the <code>accept</code> method on the incoming connection.</p>
 </div><div data-title="Generate a Capability Token" data-file="lib/twilio_capability.rb" data-highlight="5-10" class="step"><h2 id="generate-a-capability-token">Generate a Capability Token</h2>
 <p>In order to connect the <a href="//www.twilio.com/webrtc">Twilio Voice Web Client</a>
 we need a <a href="//www.twilio.com/docs/client/capability-tokens">capability token</a>.</p>
-<p>To allow incoming connections through the web client an identifier must be
-provided when generating the token. For this tutorial we used fixed identifier
-strings like <code>agent1</code> and <code>agent2</code>. These identifiers will be used to create
-outbound calls to the specified agent using the <a href="//www.twilio.com/docs/api/rest">Twilio REST API</a>.</p>
+<p>To allow incoming connections through the web client an identifier must
+be provided when generating the token. For this tutorial we used fixed
+identifier strings like <code>agent1</code> and <code>agent2</code> but you can use any
+generated string for your call center clients. These identifiers will be
+used to create outbound calls to the specified agent using the <a href="//www.twilio.com/docs/api/rest">Twilio
+REST API</a>.</p>
 <hr>
 <p><strong>See also:</strong></p>
 <ul>
@@ -81,9 +78,9 @@ outbound calls to the specified agent using the <a href="//www.twilio.com/docs/a
 <li><a href="//twilio-ruby.readthedocs.org/en/latest/usage/token-generation.html">Generate Capability Tokens with twilio-ruby</a></li>
 <li><a href="//www.twilio.com/docs/api/rest/making-calls">Making Calls With Twilio REST API</a></li>
 </ul>
-</div><div data-title="Handling Incoming Calls From Clients" data-file="app/controllers/conference_controller.rb" data-highlight="6-28" class="step"><h2 id="handling-incoming-calls-from-clients">Handling Incoming Calls From Clients</h2>
+</div><div data-title="Handling Incoming Calls From Clients" data-file="app/controllers/conference_controller.rb" data-highlight="6-28" class="step"><h2 id="handling-incoming-calls">Handling Incoming Calls</h2>
 <p>When a client makes a call to our Twilio number the application receives
-a POST request asking for instructions. We&#39;ll use TwiML to instruct the client
+a POST request asking for instructions. We&#39;ll use <a href="//www.twilio.com/docs/api/twiml/">TwiML</a> to instruct the client
 to join a conference room and the Twilio REST API client to start a call with
 the first agent, so he can join the same conference.</p>
 <p>When providing instructions to the client, we also provide a
@@ -93,18 +90,16 @@ to <a href="//www.twilio.com/docs/api/twiml/say">say</a> welcome to the user, an
 <a href="//www.twilio.com/docs/api/twiml/play">play</a> some music while on hold.
 Take a look at the code
 <a href="//github.com/TwilioDevEd/warm-transfer-rails/blob/c159c91210a7971c1c0d564bc38594a4ce378c70/lib/twiml_generator.rb#L12-L17">here</a></p>
-<p>We use the client&#39;s <code>CallSid</code> as the conference identifier. All the participants
-require to join the conference room. That&#39;s why this identifier is stored in a
-database. This way the conference identifier can be used later to dial the second
-agent in.</p>
+<p>We use the client&#39;s <a href="//www.twilio.com/help/faq/voice/what-is-a-call-sid"><code>CallSid</code></a> as the conference identifier. Since all participants
+need this identifier to join the conference we&#39;ll need to store it in a databse so that we can grab it when we dial the second agent in later.</p>
 </div><div data-title="Providing TwiML Instruction For The Client" data-file="lib/twiml_generator.rb" data-highlight="2-10" class="step"><h2 id="providing-twiml-instruction-for-the-client">Providing TwiML Instruction For The Client</h2>
-<p>We create a <code>TwiMLResponse</code> that will contain a
+<p>Here we create a <code>TwiMLResponse</code> that will contain a
 <a href="//www.twilio.com/docs/api/twiml/dial"><code>Dial</code></a> verb with a
 <a href="https://www.twilio.com/docs/api/twiml/conference"><code>Conference</code></a> noun that
 will instruct the client to join a specific conference room.</p>
-</div><div data-title="Dial First Agent Into the Call" data-file="lib/caller.rb" data-highlight="3-13" class="step"><h2 id="dial-first-agent-into-the-call">Dial First Agent Into the Call</h2>
-<p>This application uses an abstraction for the purpose of dialing agents in.
-A Twilio REST API client is used to create a new call. The <code>create</code> method
+</div><div data-title="Dial First Agent Into the Call" data-file="lib/caller.rb" class="step"><h2 id="dial-first-agent-into-the-call">Dial First Agent Into the Call</h2>
+<p>For our app we created a <code>Caller</code> module to handle dialing our agents. This module uses
+Twilio&#39;s REST API to create a new call. The <code>create</code> method
 receives a hash with the following keys:</p>
 <ol>
 <li><p><code>from</code>: Your Twilio number</p>
@@ -118,11 +113,10 @@ receives a hash with the following keys:</p>
 callback url instructing the agent&#39;s call to join the conference room where
 the client is already waiting.</p>
 </div><div data-title="Dial Second Agent Into the Call" data-file="app/controllers/conference_controller.rb" data-highlight="52-62" class="step"><h2 id="dial-second-agent-into-the-call">Dial Second Agent Into the Call</h2>
-<p>When the client and the first agents are both in the call we are ready to
+<p>When the client and the first agent are both in the call we are ready to
 perform a <em>warm  transfer</em> to a second agent. The first agent makes a
 request passing its <code>identifier</code> to allow us to look for the <code>conference_id</code>
-needed to dial the second agent in. For this purpose we&#39;ll use the
-<code>Caller</code> abstraction as done before.</p>
+needed to dial the second agent in. Since we already have a <code>Caller</code> module we can simply use the <code>call_agent</code> instance method to connect the second agent.</p>
 </div><div data-title="The First Agent Leaves the Call" data-file="lib/twiml_generator.rb" data-highlight="3-9" class="step"><h2 id="the-first-agent-leaves-the-call">The First Agent Leaves the Call</h2>
 <p>When the three participants have joined the same call, the first agent has
 served his purpose. Now he can drop the call, leaving agent two and the client
@@ -131,7 +125,7 @@ to have a pleasant conversation.</p>
 participants received when joining the call. Both, agent one and two, have
 <code>startConferenceOnEnter</code> set to <code>true</code>. This means the conference will start when
 any of them joins the call. For the client calling and for agent two, <code>endConferenceOnExit</code>
-is set to true. This causes the call to end when any of this two participants
+is set to true. This causes the call to end when either of these two participants
 drop the call.</p>
 </div><div class="step"><h2 id="where-to-next-">Where to next?</h2>
 <p>That&#39;s it! We have just implemented warm transfers using Ruby on Rails.
