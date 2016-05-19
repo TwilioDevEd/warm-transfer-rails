@@ -1,6 +1,6 @@
 {
     "title": "Warm Transfer",
-    "repo": "TwilioDevEd/warn-trasfer-rails",
+    "repo": "TwilioDevEd/warm-transfer-rails",
     "description": "In this tutorial, we will learn how to implement Warm Transfers using Ruby on Rails and Twilio",
     "heroku": false
 }
