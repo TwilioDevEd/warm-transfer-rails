@@ -6,7 +6,7 @@ module Caller
 
     client = Twilio::REST::Client.new(account_sid, auth_token)
 
-    client.account.calls.create(
+    client.calls.create(
       from: twilio_number,
       to: "client:#{agent_id}",
       url: callback_url

@@ -7,7 +7,7 @@ describe TwilioCapability do
       capability_double = double(:capability)
       agent_id = 'agent'
 
-      allow(Twilio::Util::Capability).to receive(:new)
+      allow(Twilio::JWT::Capability).to receive(:new)
         .with(ENV['TWILIO_ACCOUNT_SID'], ENV['TWILIO_AUTH_TOKEN'])
         .and_return(capability_double)
 
