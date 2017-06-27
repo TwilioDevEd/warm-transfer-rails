@@ -12,7 +12,7 @@ gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 gem 'nokogiri', '~> 1.6', '>= 1.6.7.2'
-gem 'twilio-ruby', '~> 5.0.0.rc17'
+gem 'twilio-ruby', '~> 5.0.0.rc24'
 
 group :development, :test do
   gem 'rspec-rails'
