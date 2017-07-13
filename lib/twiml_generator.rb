@@ -7,7 +7,7 @@ module TwimlGenerator
                                 end_conference_on_exit: end_on_exit,
                                 wait_url: wait_url)
     r.append(d)
-    r.to_xml_str
+    r.to_s
   end
 
   def self.generate_wait
@@ -16,6 +16,6 @@ module TwimlGenerator
           'An agent will be with you shortly.')
     r.play(url: 'http://com.twilio.music.classical.s3.amazonaws.com/BusyStrings.mp3',
            loop: 0)
-    r.to_xml_str
+    r.to_s
   end
 end
