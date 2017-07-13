@@ -1,4 +1,9 @@
+<a href="https://www.twilio.com">
+  <img src="https://static0.twilio.com/marketing/bundles/marketing/img/logos/wordmark-red.svg" alt="Twilio" width="250" />
+</a>
+
 # Warm Transfer: Transfer support calls from one agent to another using ruby on rails
+
 [![Build Status](https://travis-ci.org/TwilioDevEd/warm-transfer-rails.svg)](https://travis-ci.org/TwilioDevEd/warm-transfer-rails)
 [![Coverage Status](https://coveralls.io/repos/github/TwilioDevEd/warm-transfer-rails/badge.svg?branch=master)](https://coveralls.io/github/TwilioDevEd/warm-transfer-rails?branch=master)
 
@@ -9,20 +14,20 @@ This project is built using the [Ruby on Rails](http://rubyonrails.org/) web fra
 1. First clone this repository and `cd` into it
 
    ```bash
-   $ git clone git@github.com:TwilioDevEd/warm-transfer-rails.git
-   $ cd warm-transfer-rails
+   git clone git@github.com:TwilioDevEd/warm-transfer-rails.git
+   cd warm-transfer-rails
    ```
 
 1. Install the dependencies
 
    ```bash
-   $ bundle
+   bundle
    ```
 
 1. Copy the sample configuration file and edit it to match your configuration
 
   ```bash
-  $ cp .env.example .env
+  cp .env.example .env
   ```
 
  You can find your `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN` in your
@@ -37,18 +42,18 @@ This project is built using the [Ruby on Rails](http://rubyonrails.org/) web fra
    a Mac, I recommend [Postgres.app](http://postgresapp.com)_.
 
    ```bash
-   $ bundle exec rake db:setup
+   bundle exec rake db:setup
    ```
 
 1. Make sure the tests succeed
    ```bash
-   $ bundle exec rspec
+   bundle exec rspec
    ```
 
 1. Run the server
 
    ```bash
-   $ bundle exec rails s
+   bundle exec rails s
    ```
 
 1. Expose your application to the wider internet using [ngrok](http://ngrok.com). This step
@@ -56,7 +61,7 @@ This project is built using the [Ruby on Rails](http://rubyonrails.org/) web fra
   localhost.
 
   ```bash
-  $ ngrok http 3000
+  ngrok http 3000
   ```
 
   Once ngrok is running, open up your browser and go to your ngrok URL. It will
