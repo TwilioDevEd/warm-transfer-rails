@@ -1,5 +1,5 @@
 class ConferenceController < ApplicationController
-  skip_before_filter :verify_authenticity_token
+  skip_before_action :verify_authenticity_token
 
   AGENT_WAIT_URL = 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical'
 
@@ -58,7 +58,7 @@ class ConferenceController < ApplicationController
       conference_connect_agent2_url(conference_id: conference_id)
     )
 
-    render nothing: true
+    head :ok
   end
 
   def wait

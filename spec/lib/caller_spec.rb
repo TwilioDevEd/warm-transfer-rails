@@ -1,5 +1,4 @@
 require 'twilio-ruby'
-require_relative '../../lib/caller'
 
 describe Caller do
   describe '.call_agent' do

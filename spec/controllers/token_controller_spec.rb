@@ -9,7 +9,7 @@ RSpec.describe TokenController, type: :controller do
         .once
         .and_return('token')
 
-      post :generate, agent_id: agent_id
+      post :generate, params: { agent_id: agent_id }
 
       expect(response).to be_ok
     end

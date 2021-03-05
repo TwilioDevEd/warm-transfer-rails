@@ -1,5 +1,4 @@
 require 'twilio-ruby'
-require_relative '../../lib/twilio_capability'
 
 describe TwilioCapability do
   describe '.generate' do

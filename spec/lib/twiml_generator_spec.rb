@@ -1,6 +1,5 @@
 require 'twilio-ruby'
 require 'nokogiri'
-require_relative '../../lib/twiml_generator'
 
 describe TwimlGenerator do
   describe '.generate_connect_conference' do
@@ -11,8 +10,8 @@ describe TwimlGenerator do
       xml_string = described_class.generate_connect_conference(call_sid, url, true, false)
       document = Nokogiri::XML(xml_string)
 
-      dial_node = document.root.child
-      conference_node = dial_node.child
+      dial_node = document.xpath("//Dial").first
+      conference_node = dial_node.xpath("//Conference").first
       expect(dial_node.name).to eq('Dial')
       expect(conference_node.name).to eq('Conference')
       expect(conference_node.attribute('startConferenceOnEnter').content)
@@ -27,13 +26,13 @@ describe TwimlGenerator do
     it 'generates twiml with say and play nodes' do
       xml_string = described_class.generate_wait
       document = Nokogiri::XML(xml_string)
-
-      nodes = document.root.children
-      expect(nodes[0].name).to eq('Say')
-      expect(nodes[0].content)
+      say = document.xpath('//Say').first
+      expect(say.name).to eq('Say')
+      expect(say.content)
         .to eq('Thank you for calling. Please wait in line for a few seconds. An agent will be with you shortly.')
-      expect(nodes[1].name).to eq('Play')
-      expect(nodes[1].content)
+      play = document.xpath('//Play').first
+      expect(play.name).to eq('Play')
+      expect(play.content)
         .to eq('http://com.twilio.music.classical.s3.amazonaws.com/BusyStrings.mp3')
     end
   end
