@@ -1,17 +1,19 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-    <div class="panel panel-info client-controls">
+    <div class="card">
 
-      <div class="panel-heading">
-        <h3 class="panel-title">Support Agent Client</h3>
+      <div class="card-header">
+        <h3 class="card-title">Support Agent Client</h3>
       </div>
 
-      <div class="panel-body">
+      <div class="card-body">
         <p><strong>Status</strong></p>
-        <div class="well well-sm" id="call-status">
-          Waiting for user to connect as an agent...
+        <div class="card" id="call-status">
+          <div class="card-body">
+            Waiting for user to connect as an agent...
+          </div>
         </div>
-
+        <br>
         <div class="row" id="connect-agent-row">
           <div class="col-md-6 text-center">
             <button id="connect-agent1-button" class="btn btn-lg btn-primary">

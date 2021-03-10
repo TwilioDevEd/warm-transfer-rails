@@ -11,11 +11,11 @@ module TwimlGenerator
   end
 
   def self.generate_wait
-    r = Twilio::TwiML::VoiceResponse.new
-    r.say('Thank you for calling. Please wait in line for a few seconds. ' \
-          'An agent will be with you shortly.')
-    r.play(url: 'http://com.twilio.music.classical.s3.amazonaws.com/BusyStrings.mp3',
-           loop: 0)
-    r.to_s
+    Twilio::TwiML::VoiceResponse.new do |r|
+      r.say(message: 'Thank you for calling. Please wait in line for a few seconds. ' \
+            'An agent will be with you shortly.')
+      r.play(url: 'http://com.twilio.music.classical.s3.amazonaws.com/BusyStrings.mp3',
+            loop: 0)
+    end.to_s
   end
 end
